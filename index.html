@@ -1,0 +1,1923 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>加利足球</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="加利足球">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <style>
+        :root{
+            --gold:#E2B24E;
+            --gold-deep:#B8860B;
+            --terracotta:#C9683D;
+            --ink:#111111;
+            --night:#0a0b0c;
+            --night-2:#15140f;
+            --cream:#F7F1E3;
+            --red:#c0392b;
+            --green:#2e7d52;
+            --tab-bg:rgba(17,17,17,0.05);
+            --tab-active:rgba(17,17,17,0.12);
+        }
+        *{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','PingFang SC','Helvetica Neue',sans-serif;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+        html,body{width:100%;height:100%;overflow:hidden}
+        body{background:var(--gold);color:var(--ink);display:flex;flex-direction:column;justify-content:space-between;transition:opacity 0.4s ease;position:fixed;top:0;left:0;right:0;bottom:0}
+
+        /* ================= 欢迎页 ================= */
+        .welcome-screen{
+            position:fixed;top:0;left:0;width:100%;height:100%;
+            background:
+                radial-gradient(circle at 18% 22%, rgba(201,104,61,0.55) 0%, transparent 42%),
+                radial-gradient(circle at 85% 78%, rgba(184,134,11,0.5) 0%, transparent 48%),
+                linear-gradient(155deg,#F2C667 0%, #E2B24E 32%, #C9683D 64%, #111111 100%);
+            display:flex;flex-direction:column;justify-content:space-between;align-items:center;
+            z-index:100;cursor:pointer;transition:all 0.7s cubic-bezier(0.16,1,0.3,1);
+            padding:9vh 8% 6vh;
+            overflow:hidden;
+        }
+        .welcome-screen.slide-up{transform:translateY(-100%);opacity:0;pointer-events:none}
+        .welcome-screen::before{
+            content:'';position:absolute;inset:0;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+            background-size:46px 46px;
+            opacity:0.5;pointer-events:none;
+        }
+        .welcome-top{position:relative;z-index:2;width:100%;display:flex;justify-content:space-between;align-items:flex-start}
+        .welcome-kicker{font-size:10px;font-weight:800;letter-spacing:6px;color:rgba(17,17,17,0.55);text-transform:uppercase}
+        .welcome-kicker.right{text-align:right;color:rgba(255,255,255,0.55)}
+        .welcome-core{position:relative;z-index:2;text-align:center;animation:welcomeBreathe 4s ease-in-out infinite;display:flex;flex-direction:column;align-items:center;gap:22px}
+        @keyframes welcomeBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        .welcome-mark{width:64px;height:64px;display:block;fill:#111;opacity:0.95;filter:drop-shadow(0 8px 20px rgba(0,0,0,0.25))}
+        .welcome-title-block{display:flex;flex-direction:column;align-items:center;gap:10px}
+        .welcome-title{font-size:46px;font-weight:900;letter-spacing:14px;color:#111;line-height:1;text-shadow:0 3px 18px rgba(255,255,255,0.25)}
+        .welcome-subtitle{font-size:13px;font-weight:700;letter-spacing:14px;color:rgba(17,17,17,0.5)}
+        .welcome-divider{display:flex;align-items:center;gap:10px}
+        .welcome-divider span{width:5px;height:5px;border-radius:50%;background:#fff;opacity:0.7}
+        .welcome-divider .line{width:54px;height:1px;background:rgba(17,17,17,0.25);border-radius:0}
+        .welcome-tagline{font-size:12px;font-weight:600;letter-spacing:3px;color:rgba(255,255,255,0.85);max-width:260px;line-height:1.9}
+        .welcome-bottom{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:14px}
+        .welcome-tap{display:flex;align-items:center;gap:10px;padding:12px 28px;border:1px solid rgba(255,255,255,0.35);border-radius:999px;background:rgba(17,17,17,0.18);backdrop-filter:blur(6px)}
+        .welcome-tap-text{font-size:11px;letter-spacing:5px;color:#fff;font-weight:700}
+        .welcome-tap-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:tapPulse 1.6s ease-in-out infinite}
+        @keyframes tapPulse{0%,100%{opacity:0.4;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+        .welcome-foot{font-size:9px;letter-spacing:4px;color:rgba(17,17,17,0.4);font-weight:700}
+
+        /* ================= App容器 ================= */
+        .app-container{width:100%;max-width:440px;margin:0 auto;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px 16px 20px;position:relative;transition:opacity 0.5s ease,transform 0.5s ease}
+        .app-container.fade-out{opacity:0;transform:scale(0.97)}
+        .top-navbar{display:flex;justify-content:space-between;align-items:center;height:44px;z-index:2;flex-shrink:0}
+        .nav-btn{background:transparent;border:none;cursor:pointer;width:40px;height:40px;display:flex;justify-content:center;align-items:center;border-radius:50%;transition:all 0.2s ease}
+        .nav-btn:active{background:rgba(17,17,17,0.08);transform:scale(0.9)}
+        .nav-btn svg{width:22px;height:22px;fill:var(--ink)}
+        .main-body{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:16px;padding:0;width:100%;position:relative;z-index:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+        .ds-title-wrapper{display:flex;align-items:center;justify-content:center;gap:8px;flex-shrink:0}
+        .ds-title-logo{width:22px;height:22px;fill:var(--ink);flex-shrink:0}
+        .ds-main-title{font-size:18px;font-weight:800;letter-spacing:2px;color:var(--ink)}
+        .ds-mode-capsule{display:flex;width:100%;background:var(--tab-bg);border:2px solid var(--ink);border-radius:999px;padding:3px;box-shadow:0 2px 14px rgba(17,17,17,0.06);gap:2px;flex-shrink:0}
+        .mode-tab{flex:1;background:transparent;border:none;outline:none;padding:12px 4px;font-size:10px;font-weight:800;color:var(--ink);cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;border-radius:999px;transition:all 0.2s ease;letter-spacing:1px;position:relative}
+        .mode-tab:active{transform:scale(0.94);background:rgba(17,17,17,0.07)}
+        .mode-tab.active{background:var(--tab-active);box-shadow:0 1px 4px rgba(17,17,17,0.08)}
+        .mode-tab .tab-dot{width:6px;height:6px;border-radius:50%;background:var(--terracotta);position:absolute;top:6px;right:14px;display:none}
+        .mode-tab.filled .tab-dot{display:block}
+        .tab-icon-capsule{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,#D4A33F,#8B6914);display:inline-block;flex-shrink:0}
+        .ds-sub-tip{font-size:11px;font-weight:700;color:var(--ink);opacity:0.45;text-align:center;min-height:14px;letter-spacing:0.5px;flex-shrink:0}
+        .bottom-action-area{width:100%;padding:8px 0 0;z-index:2;flex-shrink:0}
+        .action-btn{width:100%;background:var(--ink);color:var(--gold);border:none;padding:15px;font-size:15px;font-weight:900;letter-spacing:6px;cursor:pointer;box-shadow:0 8px 28px rgba(17,17,17,0.2);transition:all 0.3s ease;position:relative;overflow:hidden;border-radius:4px}
+        .action-btn:active{transform:scale(0.96);box-shadow:0 4px 14px rgba(17,17,17,0.25)}
+        .action-btn::after{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(90deg,transparent,rgba(226,178,78,0.18),transparent);transition:left 0.5s ease}
+        .action-btn:active::after{left:120%}
+        .action-btn.disabled{opacity:0.5;pointer-events:none}
+
+        /* ================= 历史侧栏 ================= */
+        .history-sidebar{position:fixed;top:0;left:0;width:85vw;max-width:320px;height:100%;background:var(--night);color:#FFF;z-index:200;transform:translateX(-100%);transition:transform 0.3s cubic-bezier(0.16,1,0.3,1);padding:30px 20px;box-shadow:6px 0 36px rgba(0,0,0,0.35);display:flex;flex-direction:column}
+        .history-sidebar.open{transform:translateX(0)}
+        .sidebar-header{font-size:14px;font-weight:900;color:var(--gold);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid #222;display:flex;justify-content:space-between;align-items:center;letter-spacing:1px;flex-shrink:0}
+        .sidebar-search{width:100%;background:rgba(255,255,255,0.03);border:1px solid #222;color:#ccc;font-size:10px;padding:6px 10px;border-radius:4px;outline:none;margin-bottom:12px}
+        .clear-btn{background:transparent;border:1px solid #333;color:#777;font-size:10px;padding:3px 10px;cursor:pointer;border-radius:3px;letter-spacing:1px}
+        .clear-btn:active{background:rgba(255,255,255,0.04);color:#fff}
+        .history-list{list-style:none;display:flex;flex-direction:column;gap:6px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+        .history-item{padding:10px 12px;background:rgba(255,255,255,0.015);border:1px solid #1a1a1a;border-radius:4px;cursor:pointer;transition:all 0.2s}
+        .history-item:active{background:rgba(255,255,255,0.06);border-color:#333}
+        .history-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+        .history-badge{font-size:18px;cursor:pointer;flex-shrink:0}
+        .history-name{flex:1;font-size:11px;color:#ccc;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .history-del{background:transparent;border:none;color:#444;cursor:pointer;font-size:16px;flex-shrink:0}
+        .history-del:active{color:#e74c3c;transform:scale(1.3)}
+        .history-score{font-size:10px;color:#888;margin-top:4px;display:flex;align-items:center;gap:6px}
+        .score-inp{width:36px;background:rgba(255,255,255,0.05);border:1px solid #333;color:#ccc;font-size:10px;padding:2px 4px;border-radius:2px;text-align:center;outline:none}
+        .score-inp:focus{border-color:var(--gold)}
+        .history-date{font-size:9px;color:#555;margin-top:4px}
+        .win-rate-bar{height:3px;background:#222;border-radius:2px;margin-top:4px;overflow:hidden}
+        .win-rate-fill{height:100%;background:var(--gold);transition:width 0.5s ease}
+        .sidebar-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.45);z-index:150;display:none}
+        .empty-tips{color:#444;text-align:center;font-size:12px;margin-top:40px;font-weight:bold}
+        .sidebar-footer{flex-shrink:0;padding:12px 0 0;border-top:1px solid #222;margin-top:10px;font-size:10px;color:#666;letter-spacing:1px}
+        .sidebar-footer span{color:var(--gold);font-weight:800}
+
+        /* ================= 确认框 ================= */
+        .confirm-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:2500;display:none;justify-content:center;align-items:center}
+        .confirm-overlay.active{display:flex}
+        .confirm-box{background:#1a1a1a;border:1px solid rgba(212,163,63,0.3);border-radius:8px;padding:24px 20px;text-align:center;width:280px;box-shadow:0 20px 50px rgba(0,0,0,0.6)}
+        .confirm-text{color:#ccc;font-size:13px;font-weight:700;margin-bottom:18px}
+        .confirm-input{width:100%;background:rgba(255,255,255,0.05);border:1px solid #333;color:#fff;font-size:12px;padding:10px;border-radius:4px;outline:none;margin-bottom:14px;resize:vertical;min-height:60px;display:none}
+        .confirm-input:focus{border-color:var(--gold)}
+        .confirm-row{display:flex;gap:10px;justify-content:center}
+        .confirm-btn{padding:8px 20px;border-radius:4px;font-size:11px;font-weight:800;cursor:pointer;border:none}
+        .btn-cancel{background:transparent;border:1px solid #444;color:#888}
+        .btn-primary{background:var(--gold);color:#000}
+
+        /* ================= 数据面板抽屉（静态/动态/情报） ================= */
+        .panel-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:3000;opacity:0;visibility:hidden;transition:opacity 0.25s,visibility 0.25s}
+        .panel-overlay.active{opacity:1;visibility:visible}
+        .panel-sheet{position:fixed;bottom:0;left:0;width:100%;max-height:88%;background:#181712;border-top:3px solid var(--gold);border-radius:20px 20px 0 0;padding:18px 16px 26px;z-index:3001;transform:translateY(100%);transition:transform 0.32s cubic-bezier(0.16,1,0.3,1);display:flex;flex-direction:column;gap:12px;overflow:hidden}
+        .panel-sheet.active{transform:translateY(0)}
+        .panel-title{font-size:15px;font-weight:900;letter-spacing:2px;color:var(--gold);text-align:center;flex-shrink:0}
+        .panel-body{overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1;display:flex;flex-direction:column;gap:10px;padding:2px 2px 4px}
+        .panel-actions{display:flex;gap:10px;flex-shrink:0}
+        .panel-actions button{flex:1;padding:12px;font-size:13px;font-weight:800;letter-spacing:2px;cursor:pointer;border-radius:6px;border:none}
+        .btn-secondary{background:rgba(212,163,63,0.15);color:var(--gold);border:1px solid rgba(212,163,63,0.3)}
+        .btn-confirm{background:var(--gold);color:#000}
+
+        /* 静态数据面板内部 */
+        .static-search-row{display:flex;gap:8px}
+        .static-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid #333;color:#fff;font-size:13px;padding:10px 12px;border-radius:6px;outline:none}
+        .static-input:focus{border-color:var(--gold)}
+        .static-search-btn{background:var(--gold);color:#000;border:none;padding:10px 16px;font-size:12px;font-weight:800;border-radius:6px;cursor:pointer;letter-spacing:1px;white-space:nowrap}
+        .static-search-btn:active{opacity:0.8}
+        .static-status{font-size:11px;color:#888;text-align:center;padding:6px 0;line-height:1.6}
+        .static-status.err{color:var(--terracotta)}
+        .static-status.ok{color:#7ec98f}
+        .match-preview{display:flex;align-items:center;justify-content:center;gap:14px;padding:14px 8px;background:rgba(255,255,255,0.02);border-radius:8px;border:1px solid rgba(212,163,63,0.15)}
+        .match-preview-team{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0}
+        .match-preview-team img{width:40px;height:40px;object-fit:contain;border-radius:50%;background:#fff;padding:2px}
+        .match-preview-team span{font-size:11px;color:#ddd;font-weight:700;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+        .match-preview-team .rank{font-size:9px;color:var(--gold);font-weight:800}
+        .match-preview-vs{font-size:12px;color:rgba(255,255,255,0.3);font-weight:900;flex-shrink:0}
+        .static-data-block{background:rgba(255,255,255,0.02);border:1px solid #262626;border-radius:6px;padding:10px 12px}
+        .static-data-block-title{font-size:11px;color:var(--gold);font-weight:800;letter-spacing:1px;margin-bottom:6px}
+        .static-data-block-body{font-size:11px;color:#bbb;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+        .manual-form-group{display:flex;flex-direction:column;gap:4px}
+        .manual-form-group label{font-size:10px;color:#999;font-weight:700;letter-spacing:1px}
+        .manual-form-group input,.manual-form-group textarea{background:rgba(255,255,255,0.04);border:1px solid #333;color:#fff;font-size:12px;padding:9px 11px;border-radius:6px;outline:none;resize:vertical;font-family:inherit}
+        .manual-form-group input:focus,.manual-form-group textarea:focus{border-color:var(--gold)}
+        .manual-form-group textarea{min-height:54px}
+
+        /* 动态数据面板内部 */
+        .dyn-section{display:flex;flex-direction:column;gap:6px}
+        .dyn-section-title{font-size:11px;color:var(--gold);font-weight:800;letter-spacing:1px;display:flex;align-items:center;gap:6px}
+        .lineup-row{display:flex;gap:6px;align-items:center}
+        .lineup-row .pos-badge{width:28px;height:28px;border-radius:50%;background:rgba(212,163,63,0.12);color:var(--gold);font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .lineup-row input{flex:1;background:rgba(255,255,255,0.04);border:1px solid #333;color:#fff;font-size:12px;padding:8px 10px;border-radius:6px;outline:none}
+        .lineup-row input.value-input{max-width:78px;flex:0 0 78px;text-align:center}
+        .lineup-row input:focus{border-color:var(--gold)}
+        .lineup-team-block{display:flex;flex-direction:column;gap:6px;background:rgba(255,255,255,0.015);border:1px solid #262626;border-radius:8px;padding:10px}
+        .lineup-team-header{font-size:12px;font-weight:900;letter-spacing:1px;margin-bottom:2px}
+        .lineup-team-header.home{color:var(--gold)}
+        .lineup-team-header.away{color:var(--terracotta)}
+        .intel-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid #333;color:#fff;font-size:13px;padding:12px;border-radius:8px;outline:none;resize:vertical;min-height:160px;line-height:1.6;font-family:inherit}
+        .intel-textarea:focus{border-color:var(--gold)}
+        .field-hint{font-size:10px;color:#666;line-height:1.6}
+
+        /* ================= 过渡动画层（思考动画） ================= */
+        .think-overlay{position:fixed;top:0;left:0;width:100%;height:100%;z-index:4000;display:flex;justify-content:center;align-items:center;background:#050508;opacity:0;visibility:hidden;transition:opacity 1.4s ease;pointer-events:none;overflow:hidden}
+        .think-overlay.active{opacity:1;visibility:visible;pointer-events:all}
+        .think-canvas{position:relative;width:78vw;max-width:380px;height:78vw;max-height:380px;display:flex;justify-content:center;align-items:center;will-change:transform;perspective:1200px}
+        .think-core-fluid{position:absolute;width:30%;height:30%;background:linear-gradient(135deg,#ff0055,#7000ff,#00d2ff);background-size:200% 200%;border-radius:40% 60% 60% 40% / 40% 40% 60% 60%;box-shadow:0 0 60px rgba(112,0,255,0.5),inset 0 0 20px rgba(255,255,255,0.2);filter:blur(0.5px);transform:translateZ(0);will-change:border-radius,background-position;animation:fluidShape 7s ease-in-out infinite alternate, gradientShift 5s ease-in-out infinite}
+        .think-data-stream{position:absolute;width:21%;height:21%;border-radius:50%;overflow:hidden;display:flex;justify-content:space-around;opacity:0.45;mix-blend-mode:overlay;pointer-events:none}
+        .think-data-column{font-family:monospace;font-size:10px;color:#00f0ff;display:flex;flex-direction:column;animation:dataFall 2s linear infinite}
+        .think-data-column.dc-2{animation-duration:1.5s;animation-delay:0.3s;color:#ff0055}
+        .think-data-column.dc-3{animation-duration:2.5s;animation-delay:0.6s}
+        .think-orbit-ring{position:absolute;border-radius:50%;transform-style:preserve-3d;transform:translateZ(0);will-change:transform}
+        .think-ring-1{width:60%;height:60%;border:1px solid rgba(0,210,255,0.2);border-top:3px solid #00d2ff;animation:rotateX 9s linear infinite}
+        .think-ring-2{width:78%;height:78%;border:1px solid rgba(255,0,85,0.05);background:conic-gradient(from 0deg, transparent 60%, rgba(255,0,85,0.6) 90%, #fff 100%);-webkit-mask:radial-gradient(circle, transparent 68%, #000 69%);mask:radial-gradient(circle, transparent 68%, #000 69%);animation:rotateY 12s linear infinite}
+        .think-ring-3{width:48%;height:48%;border:1.5px dashed rgba(255,255,255,0.4);animation:rotateZ 15s linear infinite}
+        .think-particle-system{position:absolute;width:100%;height:100%;pointer-events:none}
+        .think-particle{position:absolute;top:50%;left:50%;background:#fff;border-radius:50%;will-change:transform,opacity}
+        .think-p-1{width:5px;height:5px;background:#00d2ff;animation:flowIn1 5s ease-in-out infinite}
+        .think-p-2{width:3px;height:3px;background:#ff0055;animation:flowIn2 6s ease-in-out infinite}
+        .think-p-3{width:6px;height:6px;background:#7000ff;animation:flowIn3 7s ease-in-out infinite}
+        .think-text{position:absolute;bottom:-12%;color:rgba(255,255,255,0.6);font-size:12px;font-weight:300;letter-spacing:0.5em;text-shadow:0 0 10px rgba(0,210,255,0.3);white-space:nowrap;animation:textBreath 2.5s ease-in-out infinite alternate}
+        @keyframes fluidShape{0%{border-radius:42% 58% 70% 30% / 45% 45% 55% 55%}33%{border-radius:70% 30% 52% 48% / 60% 40% 60% 40%}66%{border-radius:50% 50% 28% 72% / 40% 65% 35% 60%}100%{border-radius:40% 60% 64% 36% / 55% 42% 58% 45%}}
+        @keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+        @keyframes dataFall{0%{transform:translateY(-100%)}100%{transform:translateY(100%)}}
+        @keyframes rotateX{0%{transform:rotateX(65deg) rotateY(0deg) rotateZ(0deg)}100%{transform:rotateX(65deg) rotateY(360deg) rotateZ(360deg)}}
+        @keyframes rotateY{0%{transform:rotateX(-35deg) rotateY(0deg) rotateZ(0deg)}100%{transform:rotateX(-35deg) rotateY(-360deg) rotateZ(0deg)}}
+        @keyframes rotateZ{0%{transform:rotateX(20deg) rotateZ(0deg)}100%{transform:rotateX(20deg) rotateZ(-360deg)}}
+        @keyframes flowIn1{0%{transform:translate(-130px,-75px) scale(0.5);opacity:0}20%{opacity:0.8}80%{opacity:0.6}100%{transform:translate(-15px,-8px) scale(1.2);opacity:0}}
+        @keyframes flowIn2{0%{transform:translate(115px,85px) scale(1.2);opacity:0}10%{opacity:0.9}90%{opacity:0.4}100%{transform:translate(8px,15px) scale(0.2);opacity:0}}
+        @keyframes flowIn3{0%{transform:translate(-36px,130px) scale(0.2);opacity:0}30%{opacity:0.7}100%{transform:translate(22px,-30px) scale(1.5);opacity:0}}
+        @keyframes textBreath{0%{opacity:0.3;letter-spacing:0.4em}100%{opacity:0.8;letter-spacing:0.6em}}
+        .think-status-line{position:absolute;bottom:-22%;color:rgba(212,163,63,0.6);font-size:10px;letter-spacing:3px;font-weight:700;text-align:center;white-space:nowrap}
+
+        /* ================= 结果页 ================= */
+        .result-page{position:fixed;top:0;left:0;width:100%;height:100%;z-index:5000;display:flex;flex-direction:column;background:var(--cream);opacity:0;visibility:hidden;transition:opacity 1.4s ease;pointer-events:none}
+        .result-page.active{opacity:1;visibility:visible;pointer-events:all}
+        .result-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:2px solid var(--ink);flex-shrink:0;gap:10px;flex-wrap:wrap;background:var(--gold)}
+        .result-top-title{color:var(--ink);font-size:14px;font-weight:900;letter-spacing:3px;flex:1;min-width:80px}
+        .result-top-actions{display:flex;gap:6px}
+        .result-top-btn{background:transparent;border:1.5px solid var(--ink);color:var(--ink);padding:6px 10px;font-size:10px;font-weight:800;letter-spacing:1px;cursor:pointer;border-radius:4px;white-space:nowrap}
+        .result-top-btn:active{background:rgba(17,17,17,0.08)}
+        .result-close{background:var(--ink);border:1.5px solid var(--ink);color:var(--gold);padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:2px;cursor:pointer;border-radius:4px;white-space:nowrap}
+        .result-close:active{opacity:0.8}
+        .result-body{flex:1;overflow-y:auto;padding:14px 14px 0;-webkit-overflow-scrolling:touch}
+
+        /* 顶部比赛信息条 */
+        .match-header-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 12px;margin-bottom:14px;background:var(--ink);border-radius:10px;box-shadow:0 6px 20px rgba(17,17,17,0.15)}
+        .mhb-team{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:0}
+        .mhb-team img{width:42px;height:42px;object-fit:contain;border-radius:50%;background:#fff;padding:3px}
+        .mhb-team-name{font-size:12px;font-weight:900;color:#fff;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;letter-spacing:1px}
+        .mhb-team-name.home{color:var(--gold)}
+        .mhb-team-name.away{color:#e08a6a}
+        .mhb-team-rank{font-size:10px;color:rgba(255,255,255,0.55);font-weight:700}
+        .mhb-center{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding:0 6px}
+        .mhb-vs{font-size:14px;color:var(--gold);font-weight:900;letter-spacing:2px}
+        .mhb-league{font-size:9px;color:rgba(255,255,255,0.4);font-weight:700;letter-spacing:1px;text-align:center;max-width:90px}
+
+        /* 大板块卡片 */
+        .result-card{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px;margin-bottom:14px;box-shadow:0 4px 0 rgba(17,17,17,0.08)}
+        .result-card-title{font-size:14px;font-weight:900;letter-spacing:3px;color:var(--ink);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid var(--gold);display:flex;align-items:center;gap:8px}
+        .result-card-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--gold);font-size:11px;font-weight:900;align-items:center;justify-content:center;flex-shrink:0}
+        .result-card-body{font-size:13px;line-height:1.85;color:#222;letter-spacing:0.3px}
+        .result-card-body p{margin:6px 0;word-break:break-word}
+
+        /* 表格样式（绝对实力板块） */
+        .rc-table{width:100%;border-collapse:collapse;font-size:11px;margin:8px 0 12px}
+        .rc-table th,.rc-table td{border:1px solid var(--ink);padding:6px 5px;text-align:center;word-break:break-word}
+        .rc-table th{background:var(--ink);color:var(--gold);font-weight:800;letter-spacing:1px;font-size:10px}
+        .rc-table td{background:#fffdf6}
+        .rc-table tr:nth-child(even) td{background:#fbf3df}
+
+        /* 评分条 */
+        .bar-chart{display:flex;align-items:center;gap:8px;margin:6px 0;width:100%}
+        .bar-label{font-size:11px;color:#333;flex-shrink:0;min-width:48px;font-weight:700}
+        .bar-track{flex:1;max-width:60%;height:10px;background:rgba(17,17,17,0.08);border-radius:5px;overflow:hidden;border:1px solid rgba(17,17,17,0.15)}
+        .bar-fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold));border-radius:5px;max-width:100%}
+        .bar-score{font-size:11px;color:var(--ink);flex-shrink:0;min-width:40px;text-align:right;font-weight:800}
+
+        /* 正路标签 */
+        .road-tag{display:inline-block;background:var(--ink);color:var(--gold);font-size:11px;font-weight:900;letter-spacing:2px;padding:4px 12px;border-radius:4px;margin:6px 0}
+
+        /* 情报卡片 */
+        .intel-card{padding:10px 12px;background:#fffdf6;border-left:4px solid var(--ink);border-radius:0 6px 6px 0;margin-bottom:8px;border-top:1px solid #eee;border-right:1px solid #eee;border-bottom:1px solid #eee}
+        .intel-text{font-size:12px;color:#333;line-height:1.6;margin-bottom:6px;word-break:break-word}
+        .intel-signal{font-size:11px;color:#5a4309;background:rgba(212,163,63,0.18);padding:8px 10px;border-radius:4px;margin-top:4px;line-height:1.6;font-weight:600}
+
+        /* 量化推导终局区块 */
+        .verdict-box{background:var(--ink);color:var(--gold);border-radius:8px;padding:14px;margin-top:8px}
+        .verdict-box .vb-line{font-size:12px;line-height:1.9;margin-bottom:6px;color:#f5e6c0}
+        .verdict-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+        .verdict-chip{background:rgba(226,178,78,0.12);border:1px solid rgba(226,178,78,0.35);border-radius:6px;padding:8px 10px;text-align:center}
+        .verdict-chip-label{font-size:9px;color:rgba(245,230,192,0.6);letter-spacing:2px;margin-bottom:4px;font-weight:700}
+        .verdict-chip-value{font-size:14px;color:var(--gold);font-weight:900;letter-spacing:1px}
+
+        .skeleton-line{height:12px;background:linear-gradient(90deg,#eee 25%,#f7eccb 50%,#eee 75%);background-size:200% 100%;animation:skeletonShine 1.4s ease-in-out infinite;border-radius:4px;margin:6px 0}
+        @keyframes skeletonShine{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+        /* ================= 聊天框 ================= */
+        .chat-section{margin:6px 0 18px;padding-top:6px}
+        .chat-divider{display:flex;align-items:center;gap:10px;margin:10px 0 12px;color:var(--ink);opacity:0.4}
+        .chat-divider .line{flex:1;height:1px;background:var(--ink)}
+        .chat-divider span{font-size:11px;font-weight:900;letter-spacing:4px}
+        .chat-log{display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+        .chat-msg{max-width:86%;padding:10px 13px;border-radius:10px;font-size:12.5px;line-height:1.65;word-break:break-word;white-space:pre-wrap}
+        .chat-msg.user{align-self:flex-end;background:var(--ink);color:var(--gold);border-radius:10px 10px 2px 10px}
+        .chat-msg.ai{align-self:flex-start;background:#fff;color:#222;border:2px solid var(--ink);border-radius:10px 10px 10px 2px}
+        .chat-msg.ai.loading{color:#999;font-style:italic}
+        .chat-input-row{display:flex;gap:8px;align-items:flex-end;position:sticky;bottom:0;background:var(--cream);padding:8px 0 4px}
+        .chat-input{flex:1;background:#fff;border:2px solid var(--ink);color:#222;font-size:13px;padding:10px 12px;border-radius:8px;outline:none;resize:none;font-family:inherit;min-height:42px;max-height:120px;line-height:1.5}
+        .chat-input:focus{border-color:var(--gold-deep)}
+        .chat-send-btn{background:var(--ink);color:var(--gold);border:none;width:42px;height:42px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .chat-send-btn:active{opacity:0.8}
+        .chat-send-btn svg{width:18px;height:18px;fill:var(--gold)}
+        .chat-send-btn.disabled{opacity:0.4;pointer-events:none}
+
+        /* ================= Toast ================= */
+        .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(17,17,17,0.92);color:var(--gold);padding:10px 22px;font-size:12px;font-weight:800;border-radius:20px;z-index:6000;opacity:0;visibility:hidden;transition:all 0.25s ease;box-shadow:0 6px 20px rgba(0,0,0,0.25);pointer-events:none;letter-spacing:1px;max-width:80%;text-align:center}
+        .toast.active{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+
+        @media(max-width:380px){.mode-tab{font-size:9px;padding:10px 2px}.ds-main-title{font-size:16px}.action-btn{font-size:14px;letter-spacing:4px}.result-top-btn{font-size:9px;padding:5px 8px}.welcome-title{font-size:38px;letter-spacing:10px}}
+    </style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- 确认框 -->
+<div class="confirm-overlay" id="confirmOverlay"><div class="confirm-box"><p class="confirm-text" id="confirmText"></p><textarea class="confirm-input" id="confirmInput" placeholder="请详细说明..."></textarea><div class="confirm-row"><button class="confirm-btn btn-cancel" id="btnCancelConfirm">取消</button><button class="confirm-btn btn-primary" id="btnSubmitConfirm">确认</button></div></div></div>
+
+<!-- 欢迎页 -->
+<div class="welcome-screen" id="welcomeScreen" onclick="enterApp()">
+    <div class="welcome-top">
+        <span class="welcome-kicker">EST. 量化情报</span>
+        <span class="welcome-kicker right">全量尽知</span>
+    </div>
+    <div class="welcome-core">
+        <svg class="welcome-mark" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.53c-.26-.81-1-1.4-1.9-1.4h-1v-3c0-.55-.45-1-1-1h-6v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+        <div class="welcome-title-block">
+            <h1 class="welcome-title">加利足球</h1>
+            <div class="welcome-divider"><span></span><div class="line"></div><span></span></div>
+            <p class="welcome-subtitle">量 化 推 导 系 统</p>
+        </div>
+        <p class="welcome-tagline">绝对实力 · 当下状态 · 全球情报<br>穿过迷雾，看清本质</p>
+    </div>
+    <div class="welcome-bottom">
+        <div class="welcome-tap"><span class="welcome-tap-text">轻触进入</span><span class="welcome-tap-dot"></span></div>
+        <span class="welcome-foot">CLAUDE · SONNET 4.6 · THINKING</span>
+    </div>
+</div>
+
+<!-- 历史侧栏 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
+<div class="history-sidebar" id="historySidebar">
+    <div class="sidebar-header"><span>历史复盘</span><button class="clear-btn" onclick="requestClearAll()">全部清空</button></div>
+    <input class="sidebar-search" id="sidebarSearch" placeholder="搜索记录..." oninput="renderHistoryPanel()">
+    <ul class="history-list" id="historyList"></ul>
+    <div class="sidebar-footer" id="sidebarFooter"></div>
+</div>
+
+<!-- 主输入界面 -->
+<div class="app-container" id="appContainer">
+    <div class="top-navbar">
+        <button class="nav-btn" onclick="playClick();toggleSidebar(true)"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+        <button class="nav-btn" onclick="playClick();resetAll()"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+    </div>
+    <div class="main-body">
+        <div class="ds-title-wrapper">
+            <svg class="ds-title-logo" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            <h1 class="ds-main-title">加利足球量化推导</h1>
+        </div>
+        <div class="ds-mode-capsule">
+            <button class="mode-tab" id="tab-static" onclick="playClick();openPanel('static')"><span class="tab-dot"></span><span class="tab-icon-capsule"></span>静态数据</button>
+            <button class="mode-tab" id="tab-dynamic" onclick="playClick();openPanel('dynamic')"><span class="tab-dot"></span><span class="tab-icon-capsule"></span>动态数据</button>
+            <button class="mode-tab" id="tab-intel" onclick="playClick();openPanel('intel')"><span class="tab-dot"></span><span class="tab-icon-capsule"></span>全球情报</button>
+        </div>
+        <div class="ds-sub-tip" id="dsTipLine">点击上方胶囊填写数据</div>
+    </div>
+    <div class="bottom-action-area">
+        <button class="action-btn disabled" id="actionBtn" onclick="playClick();triggerExecution()">请先完善数据</button>
+    </div>
+</div>
+
+<!-- 静态数据面板 -->
+<div class="panel-overlay" id="staticOverlay" onclick="closePanel('static')"></div>
+<div class="panel-sheet" id="staticSheet">
+    <div class="panel-title">静态数据 · 体育数据API</div>
+    <div class="panel-body">
+        <div class="static-search-row">
+            <input class="static-input" id="homeNameInput" placeholder="主队中文名称（如：曼联）">
+        </div>
+        <div class="static-search-row">
+            <input class="static-input" id="awayNameInput" placeholder="客队中文名称（如：利物浦）">
+            <button class="static-search-btn" onclick="playClick();searchTeams()">搜索匹配</button>
+        </div>
+        <div class="static-status" id="staticStatus">输入两队中文名称后点击搜索匹配</div>
+
+        <div id="matchPreviewArea" style="display:none">
+            <div class="match-preview" id="matchPreview"></div>
+        </div>
+
+        <div id="staticDataArea" style="display:none"></div>
+
+        <!-- 手动兜底表单 -->
+        <div id="manualFormArea" style="display:none">
+            <div class="static-status err" style="margin-bottom:8px">未能自动匹配，请手动填写以下信息（中文即可，可直接粘贴）：</div>
+            <div class="manual-form-group"><label>赛事名称</label><input id="m_league" placeholder="如：英超 第32轮"></div>
+            <div class="manual-form-group"><label>主队名称</label><input id="m_home" placeholder="主队名称"></div>
+            <div class="manual-form-group"><label>客队名称</label><input id="m_away" placeholder="客队名称"></div>
+            <div class="manual-form-group"><label>主队排名</label><input id="m_homeRank" placeholder="如：联赛第3名"></div>
+            <div class="manual-form-group"><label>客队排名</label><input id="m_awayRank" placeholder="如：联赛第7名"></div>
+            <div class="manual-form-group"><label>主队logo链接（可选）</label><input id="m_homeLogo" placeholder="图片URL，留空则不显示"></div>
+            <div class="manual-form-group"><label>客队logo链接（可选）</label><input id="m_awayLogo" placeholder="图片URL，留空则不显示"></div>
+            <div class="manual-form-group"><label>近10场战绩（两队）</label><textarea id="m_recent" placeholder="粘贴或描述两队近10场比赛战绩、比分..."></textarea></div>
+            <div class="manual-form-group"><label>历史交锋</label><textarea id="m_h2h" placeholder="粘贴或描述两队历史交锋记录、比分..."></textarea></div>
+            <div class="manual-form-group"><label>未来赛程</label><textarea id="m_future" placeholder="粘贴或描述两队各自下一场比赛安排..."></textarea></div>
+        </div>
+    </div>
+    <div class="panel-actions">
+        <button class="btn-secondary" onclick="playClick();fillManualForm()">手动填写</button>
+        <button class="btn-confirm" onclick="playClick();confirmPanel('static')">确认</button>
+    </div>
+</div>
+
+<!-- 动态数据面板 -->
+<div class="panel-overlay" id="dynamicOverlay" onclick="closePanel('dynamic')"></div>
+<div class="panel-sheet" id="dynamicSheet">
+    <div class="panel-title">动态数据 · 手动输入</div>
+    <div class="panel-body">
+        <div class="field-hint">填写两队的首发11人名单与对应身价（单位可写百万欧元等，留空行不影响推导），以及任何你想补充的信息。</div>
+        <div class="dyn-section">
+            <div class="lineup-team-block">
+                <div class="lineup-team-header home" id="lineupHomeLabel">主队首发名单</div>
+                <div id="lineupHome"></div>
+            </div>
+            <div class="lineup-team-block">
+                <div class="lineup-team-header away" id="lineupAwayLabel">客队首发名单</div>
+                <div id="lineupAway"></div>
+            </div>
+        </div>
+        <div class="dyn-section">
+            <div class="dyn-section-title">其他补充信息（可选）</div>
+            <textarea class="intel-textarea" id="dynExtra" style="min-height:80px" placeholder="伤停、状态、战术变化等其他你想补充的内容..."></textarea>
+        </div>
+    </div>
+    <div class="panel-actions">
+        <button class="btn-confirm" style="flex:1" onclick="playClick();confirmPanel('dynamic')">确认</button>
+    </div>
+</div>
+
+<!-- 全球情报面板 -->
+<div class="panel-overlay" id="intelOverlay" onclick="closePanel('intel')"></div>
+<div class="panel-sheet" id="intelSheet">
+    <div class="panel-title">全球情报 · 文字粘贴</div>
+    <div class="panel-body">
+        <div class="field-hint">将你收集到的情报原文粘贴在下方，AI会进行分列、信号解读，自动排除无关信息。</div>
+        <textarea class="intel-textarea" id="intelText" placeholder="粘贴情报原文，可以是多条、来自不同来源..."></textarea>
+    </div>
+    <div class="panel-actions">
+        <button class="btn-confirm" style="flex:1" onclick="playClick();confirmPanel('intel')">确认</button>
+    </div>
+</div>
+
+<!-- 思考过渡动画层 -->
+<div class="think-overlay" id="thinkOverlay">
+    <div class="think-canvas">
+        <div class="think-core-fluid"></div>
+        <div class="think-data-stream">
+            <div class="think-data-column"><span>1</span><span>0</span><span>1</span><span>0</span></div>
+            <div class="think-data-column dc-2"><span>0</span><span>1</span><span>1</span><span>0</span></div>
+            <div class="think-data-column dc-3"><span>1</span><span>0</span><span>0</span><span>1</span></div>
+        </div>
+        <div class="think-orbit-ring think-ring-1"></div>
+        <div class="think-orbit-ring think-ring-2"></div>
+        <div class="think-orbit-ring think-ring-3"></div>
+        <div class="think-particle-system">
+            <div class="think-particle think-p-1"></div>
+            <div class="think-particle think-p-2"></div>
+            <div class="think-particle think-p-3"></div>
+        </div>
+        <div class="think-text">INFERRING THOUGHTS</div>
+        <div class="think-status-line" id="thinkStatusLine">解析数据结构...</div>
+    </div>
+</div>
+
+<!-- 结果页 -->
+<div class="result-page" id="resultPage">
+    <div class="result-top">
+        <span class="result-top-title">量化推导结果</span>
+        <div class="result-top-actions">
+            <button class="result-top-btn" id="btnCopyResult">复制</button>
+            <button class="result-top-btn" id="btnRerun">重新推导</button>
+        </div>
+        <button class="result-close" onclick="playClick();closeResult()">关闭</button>
+    </div>
+    <div class="result-body" id="resultBody"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ============== 配置 ============== */
+var FOOTBALL_API_KEY = 'ea97931ab299a26e86bebbd36366686c';
+var FOOTBALL_API_BASE = 'https://v3.football.api-sports.io';
+var CLAUDE_RELAY_KEY = 'wVjjgJ56uJGEnoL7NmKLRRty4zG1uuRrHJrnfLqPMmx3QuQI';
+var CLAUDE_RELAY_URL = 'https://api.apibox.cc/v1/messages';
+var CLAUDE_MODEL = 'claude-sonnet-4-6-thinking';
+var LINEUP_SLOTS = 11;
+
+/* ============== 状态 ============== */
+var state = {
+    static: { matched:false, manual:false, data:null },
+    dynamic: { lineupHome:[], lineupAway:[], extra:'' },
+    intel: { text:'' },
+    records: [],
+    chatHistory: [], // 当前结果页的聊天上下文
+    currentResultText: '',
+    isProcessing: false,
+    confirmCB: null,
+    actx: null
+};
+
+var $ = function(id){ return document.getElementById(id); };
+var els = {};
+window.GALI = window.GALI || {};
+window.GALI.elsObj = els;
+
+function cacheEls(){
+    var ids = ['toast','confirmOverlay','confirmText','confirmInput','btnCancelConfirm','btnSubmitConfirm',
+        'welcomeScreen','sidebarOverlay','historySidebar','historyList','sidebarSearch','sidebarFooter',
+        'appContainer','dsTipLine','actionBtn',
+        'staticOverlay','staticSheet','homeNameInput','awayNameInput','staticStatus','matchPreviewArea','matchPreview','staticDataArea','manualFormArea',
+        'dynamicOverlay','dynamicSheet','lineupHome','lineupAway','lineupHomeLabel','lineupAwayLabel','dynExtra',
+        'intelOverlay','intelSheet','intelText',
+        'thinkOverlay','thinkStatusLine',
+        'resultPage','resultBody','btnCopyResult','btnRerun',
+        'tab-static','tab-dynamic','tab-intel'
+    ];
+    ids.forEach(function(id){ els[id] = $(id); });
+}
+
+/* ============== 音效系统 ============== */
+function getCtx(){
+    if(!state.actx){
+        try{ state.actx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ state.actx=null; }
+    }
+    if(state.actx && state.actx.state==='suspended'){ try{ state.actx.resume(); }catch(e){} }
+    return state.actx;
+}
+
+// 08. 幽灵暗刻 - 用于点击音效（进入app、各类按钮）
+function playClick(){
+    try{
+        var ctx = getCtx(); if(!ctx) return;
+        var bufferSize = ctx.sampleRate * 0.04;
+        var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        var data = buffer.getChannelData(0);
+        for(var i=0;i<bufferSize;i++){ data[i] = Math.random()*2-1; }
+        var noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+        var filter = ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(220, ctx.currentTime);
+        filter.Q.setValueAtTime(4, ctx.currentTime);
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.4, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.03);
+        noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        noise.start(); noise.stop(ctx.currentTime+0.03);
+    }catch(e){}
+}
+
+// 01. 天鹅绒钝击 - 用于开启量化推导
+function playStart(){
+    try{
+        var ctx = getCtx(); if(!ctx) return;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(90, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(40, ctx.currentTime+0.08);
+        gain.gain.setValueAtTime(0.8, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.08);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(); osc.stop(ctx.currentTime+0.08);
+    }catch(e){}
+}
+
+// 自创打印机音效 - 用于推导结果出现，丝滑不刺耳
+function playPrinter(){
+    try{
+        var ctx = getCtx(); if(!ctx) return;
+        var now = ctx.currentTime;
+        var totalDur = 0.9;
+        // 主体：类似打印头来回扫动的轻微噪声纹理，经过低通滤波，叠加缓慢的音量律动
+        var bufferSize = Math.floor(ctx.sampleRate * totalDur);
+        var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        var data = buffer.getChannelData(0);
+        for(var i=0;i<bufferSize;i++){
+            data[i] = (Math.random()*2-1) * 0.6;
+        }
+        var noise = ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        var filter = ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(900, now);
+        filter.frequency.linearRampToValueAtTime(1400, now+totalDur*0.5);
+        filter.frequency.linearRampToValueAtTime(700, now+totalDur);
+        filter.Q.value = 0.7;
+
+        var gain = ctx.createGain();
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.05, now+0.06);
+
+        // 模拟"走纸"的细微律动：用LFO轻微调制音量
+        var lfo = ctx.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(14, now);
+        var lfoGain = ctx.createGain();
+        lfoGain.gain.value = 0.02;
+        lfo.connect(lfoGain);
+        lfoGain.connect(gain.gain);
+
+        gain.gain.setValueAtTime(0.05, now+0.06);
+        gain.gain.linearRampToValueAtTime(0.04, now+totalDur*0.6);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now+totalDur);
+
+        noise.connect(filter); filter.connect(gain); gain.connect(ctx.destination);
+        noise.start(now); noise.stop(now+totalDur);
+        lfo.start(now); lfo.stop(now+totalDur);
+
+        // 收尾：一声极轻的"出纸"高频回弹
+        setTimeout(function(){
+            try{
+                var c2 = getCtx(); if(!c2) return;
+                var o2 = c2.createOscillator();
+                var g2 = c2.createGain();
+                o2.type='triangle';
+                o2.frequency.setValueAtTime(420, c2.currentTime);
+                o2.frequency.exponentialRampToValueAtTime(260, c2.currentTime+0.12);
+                g2.gain.setValueAtTime(0.05, c2.currentTime);
+                g2.gain.exponentialRampToValueAtTime(0.0001, c2.currentTime+0.12);
+                o2.connect(g2); g2.connect(c2.destination);
+                o2.start(); o2.stop(c2.currentTime+0.12);
+            }catch(e){}
+        }, totalDur*1000*0.7);
+    }catch(e){}
+}
+
+function vibrate(){ if(navigator.vibrate) navigator.vibrate([30,50,30]); }
+
+/* ============== Toast / Confirm ============== */
+function toast(t){
+    els.toast.innerText = t;
+    els.toast.classList.add('active');
+    setTimeout(function(){ els.toast.classList.remove('active'); }, 2200);
+}
+function showConfirm(t, cb, showInput){
+    els.confirmText.innerText = t;
+    els.confirmInput.style.display = showInput ? 'block':'none';
+    els.confirmInput.value = '';
+    els.confirmOverlay.classList.add('active');
+    state.confirmCB = cb;
+}
+function closeConfirm(){
+    els.confirmOverlay.classList.remove('active');
+    state.confirmCB = null;
+    els.confirmInput.style.display = 'none';
+}
+
+/* ============== 欢迎页 ============== */
+function enterApp(){
+    els.welcomeScreen.classList.add('slide-up');
+    playClick();
+    if(window.GALI && window.GALI.renderHistoryPanel) window.GALI.renderHistoryPanel();
+}
+
+/* ============== 侧栏 ============== */
+function toggleSidebar(o){
+    els.historySidebar.classList.toggle('open', o);
+    els.sidebarOverlay.style.display = o ? 'block':'none';
+    if(o) renderHistoryPanel();
+}
+
+window.GALI.state = state;
+window.GALI.cacheEls = cacheEls;
+window.GALI.playClick = playClick;
+window.GALI.playStart = playStart;
+window.GALI.playPrinter = playPrinter;
+window.GALI.vibrate = vibrate;
+window.GALI.toast = toast;
+window.GALI.showConfirm = showConfirm;
+window.GALI.closeConfirm = closeConfirm;
+window.GALI.$ = $;
+window.GALI.FOOTBALL_API_KEY = FOOTBALL_API_KEY;
+window.GALI.FOOTBALL_API_BASE = FOOTBALL_API_BASE;
+window.GALI.CLAUDE_RELAY_KEY = CLAUDE_RELAY_KEY;
+window.GALI.CLAUDE_RELAY_URL = CLAUDE_RELAY_URL;
+window.GALI.CLAUDE_MODEL = CLAUDE_MODEL;
+window.GALI.LINEUP_SLOTS = LINEUP_SLOTS;
+
+window.enterApp = enterApp;
+window.toggleSidebar = toggleSidebar;
+window.playClick = playClick;
+
+})();
+
+(function(){
+'use strict';
+var G = window.GALI;
+var state = G.state, els = G.elsObj, $ = G.$;
+
+/* ============== 中文球队名 -> 常见英文别名映射 ============== */
+// 用于将中文输入翻译为搜索关键词，覆盖常见热门球队；其余直接用原文搜索
+var TEAM_NAME_MAP = {
+    '曼联':'Manchester United','曼彻斯特联':'Manchester United',
+    '曼城':'Manchester City','曼彻斯特城':'Manchester City',
+    '利物浦':'Liverpool','切尔西':'Chelsea','阿森纳':'Arsenal','热刺':'Tottenham','托特纳姆':'Tottenham',
+    '纽卡斯尔':'Newcastle','纽卡':'Newcastle','西汉姆':'West Ham','埃弗顿':'Everton','狼队':'Wolves',
+    '阿斯顿维拉':'Aston Villa','维拉':'Aston Villa','莱斯特城':'Leicester','水晶宫':'Crystal Palace',
+    '布莱顿':'Brighton','富勒姆':'Fulham','伯恩利':'Burnley','诺丁汉森林':'Nottingham Forest',
+    '皇马':'Real Madrid','皇家马德里':'Real Madrid','巴萨':'Barcelona','巴塞罗那':'Barcelona',
+    '马竞':'Atletico Madrid','马德里竞技':'Atletico Madrid','塞维利亚':'Sevilla','瓦伦西亚':'Valencia',
+    '皇家社会':'Real Sociedad','比利亚雷亚尔':'Villarreal','毕尔巴鄂':'Athletic Bilbao','贝蒂斯':'Real Betis',
+    '尤文':'Juventus','尤文图斯':'Juventus','国际米兰':'Inter','国米':'Inter','AC米兰':'AC Milan','米兰':'AC Milan',
+    '罗马':'Roma','那不勒斯':'Napoli','拿坡里':'Napoli','拉齐奥':'Lazio','亚特兰大':'Atalanta','佛罗伦萨':'Fiorentina',
+    '拜仁':'Bayern Munich','拜仁慕尼黑':'Bayern Munich','多特':'Borussia Dortmund','多特蒙德':'Borussia Dortmund',
+    '勒沃库森':'Bayer Leverkusen','莱比锡':'RB Leipzig','法兰克福':'Eintracht Frankfurt','沃尔夫斯堡':'Wolfsburg',
+    '巴黎':'Paris Saint Germain','巴黎圣日耳曼':'Paris Saint Germain','摩纳哥':'Monaco','里尔':'Lille',
+    '马赛':'Marseille','里昂':'Lyon','尼斯':'Nice','雷恩':'Rennes',
+    '波尔图':'Porto','本菲卡':'Benfica','里斯本竞技':'Sporting CP','葡萄牙体育':'Sporting CP',
+    '阿贾克斯':'Ajax','费耶诺德':'Feyenoord','埃因霍温':'PSV',
+    '凌晨':'','无': '' // 防御性占位
+};
+
+function translateName(cn){
+    cn = (cn||'').trim();
+    if(!cn) return '';
+    if(TEAM_NAME_MAP[cn] !== undefined) return TEAM_NAME_MAP[cn] || cn;
+    return cn;
+}
+
+/* ============== Football API 调用 ============== */
+function fbFetch(path){
+    return fetch(G.FOOTBALL_API_BASE + path, {
+        method:'GET',
+        headers:{ 'x-apisports-key': G.FOOTBALL_API_KEY }
+    }).then(function(res){
+        if(!res.ok) throw new Error('API请求失败 '+res.status);
+        return res.json();
+    });
+}
+
+function searchTeam(name){
+    var q = translateName(name);
+    if(!q) return Promise.resolve(null);
+    return fbFetch('/teams?search='+encodeURIComponent(q)).then(function(d){
+        if(d && d.response && d.response.length>0){
+            return d.response[0]; // {team:{id,name,logo,...}, venue:{...}}
+        }
+        return null;
+    }).catch(function(){ return null; });
+}
+
+function getStandingForTeam(teamId, leagueId, season){
+    if(!leagueId) return Promise.resolve(null);
+    return fbFetch('/standings?league='+leagueId+'&season='+season).then(function(d){
+        if(!d || !d.response || !d.response[0]) return null;
+        var standings = d.response[0].league.standings;
+        var flat = [];
+        standings.forEach(function(grp){ flat = flat.concat(grp); });
+        var found = null;
+        flat.forEach(function(row){ if(row.team && row.team.id===teamId) found = row; });
+        return found;
+    }).catch(function(){ return null; });
+}
+
+function getLastFixtures(teamId, count){
+    return fbFetch('/fixtures?team='+teamId+'&last='+count).then(function(d){
+        return (d && d.response) || [];
+    }).catch(function(){ return []; });
+}
+
+function getNextFixtures(teamId, count){
+    return fbFetch('/fixtures?team='+teamId+'&next='+count).then(function(d){
+        return (d && d.response) || [];
+    }).catch(function(){ return []; });
+}
+
+function getH2H(id1, id2, count){
+    return fbFetch('/fixtures/headtohead?h2h='+id1+'-'+id2+'&last='+(count||10)).then(function(d){
+        return (d && d.response) || [];
+    }).catch(function(){ return []; });
+}
+
+function fmtFixtureLine(fx){
+    try{
+        var date = fx.fixture.date ? fx.fixture.date.substring(0,10) : '';
+        var home = fx.teams.home.name, away = fx.teams.away.name;
+        var gh = fx.goals.home, ga = fx.goals.away;
+        var score = (gh===null||ga===null) ? '未开赛' : (gh+' - '+ga);
+        var league = fx.league ? fx.league.name : '';
+        return date+' | '+home+' '+score+' '+away+' | '+league;
+    }catch(e){ return ''; }
+}
+
+/* ============== 主搜索流程 ============== */
+function setStaticStatus(text, cls){
+    els.staticStatus.innerText = text;
+    els.staticStatus.className = 'static-status' + (cls? ' '+cls:'');
+}
+
+function searchTeams(){
+    var homeName = els.homeNameInput.value.trim();
+    var awayName = els.awayNameInput.value.trim();
+    if(!homeName || !awayName){
+        toast('请输入两队名称');
+        return;
+    }
+    els.matchPreviewArea.style.display = 'none';
+    els.staticDataArea.style.display = 'none';
+    els.manualFormArea.style.display = 'none';
+    setStaticStatus('正在搜索匹配球队...');
+
+    Promise.all([searchTeam(homeName), searchTeam(awayName)]).then(function(res){
+        var home = res[0], away = res[1];
+        if(!home || !away){
+            setStaticStatus('未能匹配到 '+(!home?homeName:'')+(!home&&!away?' / ':'')+(!away?awayName:'')+'，请使用下方手动填写', 'err');
+            fillManualForm();
+            return;
+        }
+        setStaticStatus('匹配成功，正在拉取数据...', 'ok');
+        loadFullStaticData(home.team, away.team, homeName, awayName);
+    }).catch(function(e){
+        setStaticStatus('搜索出错：'+(e.message||'未知错误')+'，请手动填写', 'err');
+        fillManualForm();
+    });
+}
+
+function loadFullStaticData(homeTeam, awayTeam, homeNameCN, awayNameCN){
+    var season = new Date().getFullYear();
+    Promise.all([
+        getLastFixtures(homeTeam.id, 10),
+        getLastFixtures(awayTeam.id, 10),
+        getNextFixtures(homeTeam.id, 5),
+        getNextFixtures(awayTeam.id, 5),
+        getH2H(homeTeam.id, awayTeam.id, 10)
+    ]).then(function(res){
+        var homeRecent = res[0], awayRecent = res[1], homeFuture = res[2], awayFuture = res[3], h2h = res[4];
+
+        // 尝试从近场比赛中提取联赛信息以获取排名
+        var leagueId = null, leagueName = '', leagueSeason = season;
+        if(homeRecent.length>0 && homeRecent[0].league){
+            leagueId = homeRecent[0].league.id;
+            leagueName = homeRecent[0].league.name;
+            leagueSeason = homeRecent[0].league.season || season;
+        }
+
+        Promise.all([
+            getStandingForTeam(homeTeam.id, leagueId, leagueSeason),
+            getStandingForTeam(awayTeam.id, leagueId, leagueSeason)
+        ]).then(function(stRes){
+            var homeStanding = stRes[0], awayStanding = stRes[1];
+
+            var data = {
+                source:'api',
+                league: leagueName || '未识别赛事',
+                home:{
+                    name: homeTeam.name, nameCN: homeNameCN, logo: homeTeam.logo, id: homeTeam.id,
+                    rank: homeStanding ? ('第'+homeStanding.rank+'名 ('+homeStanding.points+'分)') : '暂无排名数据'
+                },
+                away:{
+                    name: awayTeam.name, nameCN: awayNameCN, logo: awayTeam.logo, id: awayTeam.id,
+                    rank: awayStanding ? ('第'+awayStanding.rank+'名 ('+awayStanding.points+'分)') : '暂无排名数据'
+                },
+                recentHome: homeRecent.map(fmtFixtureLine).filter(Boolean).join('\n') || '暂无数据',
+                recentAway: awayRecent.map(fmtFixtureLine).filter(Boolean).join('\n') || '暂无数据',
+                h2h: h2h.length>0 ? h2h.map(fmtFixtureLine).filter(Boolean).join('\n') : '__NO_H2H__',
+                futureHome: homeFuture.length>0 ? homeFuture.map(fmtFixtureLine).filter(Boolean).join('\n') : '__NO_FUTURE__',
+                futureAway: awayFuture.length>0 ? awayFuture.map(fmtFixtureLine).filter(Boolean).join('\n') : '__NO_FUTURE__'
+            };
+
+            state.static.data = data;
+            state.static.matched = true;
+            state.static.manual = false;
+            renderStaticPreview(data);
+            setStaticStatus('数据已获取，可点击"确认"完成', 'ok');
+
+            // 若H2H或未来赛程缺失，提示用户补充
+            if(data.h2h === '__NO_H2H__' || data.futureHome === '__NO_FUTURE__' || data.futureAway === '__NO_FUTURE__'){
+                showSupplementForm(data);
+            }
+        });
+    }).catch(function(e){
+        setStaticStatus('数据拉取出错：'+(e.message||'未知')+'，请手动填写', 'err');
+        fillManualForm();
+    });
+}
+
+function renderStaticPreview(data){
+    els.matchPreviewArea.style.display = 'block';
+    var html = '';
+    html += '<div class="match-preview-team">';
+    html += data.home.logo ? '<img src="'+data.home.logo+'" alt="">' : '';
+    html += '<span>'+(data.home.nameCN||data.home.name)+'</span>';
+    html += '<span class="rank">'+data.home.rank+'</span>';
+    html += '</div>';
+    html += '<div class="match-preview-vs">VS</div>';
+    html += '<div class="match-preview-team">';
+    html += data.away.logo ? '<img src="'+data.away.logo+'" alt="">' : '';
+    html += '<span>'+(data.away.nameCN||data.away.name)+'</span>';
+    html += '<span class="rank">'+data.away.rank+'</span>';
+    html += '</div>';
+    els.matchPreview.innerHTML = html;
+
+    els.staticDataArea.style.display = 'block';
+    var dHtml = '';
+    dHtml += staticBlock('赛事', data.league);
+    dHtml += staticBlock('主队近10场', data.recentHome);
+    dHtml += staticBlock('客队近10场', data.recentAway);
+    dHtml += staticBlock('历史交锋', data.h2h==='__NO_H2H__' ? '（暂无数据，请在下方补充）' : data.h2h);
+    dHtml += staticBlock('主队未来赛程', data.futureHome==='__NO_FUTURE__' ? '（暂无数据，请在下方补充）' : data.futureHome);
+    dHtml += staticBlock('客队未来赛程', data.futureAway==='__NO_FUTURE__' ? '（暂无数据，请在下方补充）' : data.futureAway);
+    els.staticDataArea.innerHTML = dHtml;
+}
+
+function staticBlock(title, body){
+    return '<div class="static-data-block"><div class="static-data-block-title">'+title+'</div><div class="static-data-block-body">'+escapeHtml(body)+'</div></div>';
+}
+
+function escapeHtml(s){
+    return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});
+}
+
+/* 当API数据有缺失（H2H/未来赛程）时，显示补充输入区 */
+function showSupplementForm(data){
+    els.manualFormArea.style.display = 'block';
+    var html = '<div class="static-status err" style="margin-bottom:8px">部分数据未能自动获取，请补充：</div>';
+    if(data.h2h === '__NO_H2H__'){
+        html += '<div class="manual-form-group"><label>历史交锋（两队最近未有直接对阵安排，请补充已知历史交锋信息，若完全没有交锋历史可填"无历史交锋"）</label><textarea id="sup_h2h" placeholder="描述历史交锋记录..."></textarea></div>';
+    }
+    if(data.futureHome === '__NO_FUTURE__'){
+        html += '<div class="manual-form-group"><label>主队未来赛程（请补充主队下一场比赛安排）</label><textarea id="sup_futureHome" placeholder="如：3天后客场对阵XX..."></textarea></div>';
+    }
+    if(data.futureAway === '__NO_FUTURE__'){
+        html += '<div class="manual-form-group"><label>客队未来赛程（请补充客队下一场比赛安排）</label><textarea id="sup_futureAway" placeholder="如：5天后主场对阵XX..."></textarea></div>';
+    }
+    els.manualFormArea.innerHTML = html;
+}
+
+/* ============== 手动表单兜底 ============== */
+function fillManualForm(){
+    els.matchPreviewArea.style.display = 'none';
+    els.staticDataArea.style.display = 'none';
+    els.manualFormArea.style.display = 'block';
+    rebuildManualFormHTML();
+    // 预填已输入的中文队名
+    var h = $('m_home'), a = $('m_away');
+    if(h && !h.value) h.value = els.homeNameInput.value.trim();
+    if(a && !a.value) a.value = els.awayNameInput.value.trim();
+    state.static.manual = true;
+    state.static.matched = false;
+}
+
+function rebuildManualFormHTML(){
+    els.manualFormArea.innerHTML =
+        '<div class="static-status err" style="margin-bottom:8px">请手动填写以下信息（中文即可，可直接粘贴）：</div>'+
+        '<div class="manual-form-group"><label>赛事名称</label><input id="m_league" placeholder="如：英超 第32轮"></div>'+
+        '<div class="manual-form-group"><label>主队名称</label><input id="m_home" placeholder="主队名称"></div>'+
+        '<div class="manual-form-group"><label>客队名称</label><input id="m_away" placeholder="客队名称"></div>'+
+        '<div class="manual-form-group"><label>主队排名</label><input id="m_homeRank" placeholder="如：联赛第3名"></div>'+
+        '<div class="manual-form-group"><label>客队排名</label><input id="m_awayRank" placeholder="如：联赛第7名"></div>'+
+        '<div class="manual-form-group"><label>主队logo链接（可选）</label><input id="m_homeLogo" placeholder="图片URL，留空则不显示"></div>'+
+        '<div class="manual-form-group"><label>客队logo链接（可选）</label><input id="m_awayLogo" placeholder="图片URL，留空则不显示"></div>'+
+        '<div class="manual-form-group"><label>近10场战绩（两队）</label><textarea id="m_recent" placeholder="粘贴或描述两队近10场比赛战绩、比分..."></textarea></div>'+
+        '<div class="manual-form-group"><label>历史交锋</label><textarea id="m_h2h" placeholder="粘贴或描述两队历史交锋记录、比分，若无历史交锋请填写&quot;无历史交锋&quot;"></textarea></div>'+
+        '<div class="manual-form-group"><label>未来赛程</label><textarea id="m_future" placeholder="粘贴或描述两队各自下一场比赛安排..."></textarea></div>';
+}
+
+function collectManualData(){
+    var get = function(id){ var e=$(id); return e ? e.value.trim() : ''; };
+    return {
+        source:'manual',
+        league: get('m_league') || '未填写',
+        home:{ name:get('m_home')||'主队', nameCN:get('m_home')||'主队', logo:get('m_homeLogo'), id:null, rank:get('m_homeRank')||'未填写' },
+        away:{ name:get('m_away')||'客队', nameCN:get('m_away')||'客队', logo:get('m_awayLogo'), id:null, rank:get('m_awayRank')||'未填写' },
+        recentHome: get('m_recent')||'未填写',
+        recentAway: '',
+        h2h: get('m_h2h')||'未填写',
+        futureHome: get('m_future')||'未填写',
+        futureAway: ''
+    };
+}
+
+function collectSupplementData(){
+    var sup = {};
+    var h2h = $('sup_h2h'), fh = $('sup_futureHome'), fa = $('sup_futureAway');
+    if(h2h) sup.h2h = h2h.value.trim();
+    if(fh) sup.futureHome = fh.value.trim();
+    if(fa) sup.futureAway = fa.value.trim();
+    return sup;
+}
+
+window.GALI.searchTeams = searchTeams;
+window.GALI.fillManualForm = fillManualForm;
+window.GALI.collectManualData = collectManualData;
+window.GALI.collectSupplementData = collectSupplementData;
+window.GALI.escapeHtml = escapeHtml;
+
+window.searchTeams = searchTeams;
+window.fillManualForm = fillManualForm;
+
+})();
+
+(function(){
+'use strict';
+var G = window.GALI;
+var state = G.state, els = G.elsObj, $ = G.$;
+
+/* ============== 动态数据：首发名单渲染 ============== */
+function buildLineupInputs(){
+    var homeLabel = (state.static.data && (state.static.data.home.nameCN||state.static.data.home.name)) || '主队';
+    var awayLabel = (state.static.data && (state.static.data.away.nameCN||state.static.data.away.name)) || '客队';
+    els['lineupHomeLabel'].innerText = homeLabel + ' 首发名单';
+    els['lineupAwayLabel'].innerText = awayLabel + ' 首发名单';
+
+    renderLineupBlock('lineupHome', state.dynamic.lineupHome);
+    renderLineupBlock('lineupAway', state.dynamic.lineupAway);
+}
+
+function renderLineupBlock(containerId, dataArr){
+    var container = els[containerId];
+    container.innerHTML = '';
+    for(var i=0;i<G.LINEUP_SLOTS;i++){
+        var item = dataArr[i] || {name:'', value:''};
+        var row = document.createElement('div');
+        row.className = 'lineup-row';
+        var badge = document.createElement('span');
+        badge.className = 'pos-badge';
+        badge.innerText = (i+1);
+        var nameInput = document.createElement('input');
+        nameInput.placeholder = '球员姓名';
+        nameInput.value = item.name;
+        nameInput.dataset.idx = i;
+        nameInput.dataset.field = 'name';
+        var valueInput = document.createElement('input');
+        valueInput.className = 'value-input';
+        valueInput.placeholder = '身价';
+        valueInput.value = item.value;
+        valueInput.dataset.idx = i;
+        valueInput.dataset.field = 'value';
+        row.appendChild(badge);
+        row.appendChild(nameInput);
+        row.appendChild(valueInput);
+        container.appendChild(row);
+    }
+}
+
+function collectLineupBlock(containerId){
+    var container = els[containerId];
+    var inputs = container.querySelectorAll('input');
+    var arr = [];
+    for(var i=0;i<G.LINEUP_SLOTS;i++) arr.push({name:'', value:''});
+    inputs.forEach(function(inp){
+        var idx = parseInt(inp.dataset.idx,10);
+        var field = inp.dataset.field;
+        if(arr[idx]) arr[idx][field] = inp.value.trim();
+    });
+    return arr;
+}
+
+/* ============== 面板开关 ============== */
+var PANEL_IDS = {
+    static:{overlay:'staticOverlay', sheet:'staticSheet'},
+    dynamic:{overlay:'dynamicOverlay', sheet:'dynamicSheet'},
+    intel:{overlay:'intelOverlay', sheet:'intelSheet'}
+};
+
+function openPanel(key){
+    var p = PANEL_IDS[key];
+    if(!p) return;
+    if(key === 'dynamic'){ buildLineupInputs(); els['dynExtra'].value = state.dynamic.extra; }
+    if(key === 'intel'){ els['intelText'].value = state.intel.text; }
+    els[p.overlay].classList.add('active');
+    els[p.sheet].classList.add('active');
+}
+
+function closePanel(key){
+    var p = PANEL_IDS[key];
+    if(!p) return;
+    els[p.overlay].classList.remove('active');
+    els[p.sheet].classList.remove('active');
+}
+
+function confirmPanel(key){
+    if(key === 'static'){
+        if(state.static.manual){
+            var manual = G.collectManualData();
+            var sup = G.collectSupplementData();
+            Object.assign(manual, sup);
+            state.static.data = manual;
+            state.static.matched = true; // 视为已填写
+        } else if(!state.static.data){
+            G.toast('请先搜索匹配或手动填写');
+            return;
+        } else {
+            // 合并补充数据
+            var sup2 = G.collectSupplementData();
+            Object.assign(state.static.data, sup2);
+        }
+    } else if(key === 'dynamic'){
+        state.dynamic.lineupHome = collectLineupBlock('lineupHome');
+        state.dynamic.lineupAway = collectLineupBlock('lineupAway');
+        state.dynamic.extra = els['dynExtra'].value.trim();
+    } else if(key === 'intel'){
+        state.intel.text = els['intelText'].value.trim();
+    }
+    closePanel(key);
+    updateTabStates();
+    updateActionButton();
+}
+
+/* ============== Tab状态点（已填写指示） ============== */
+function updateTabStates(){
+    var hasStatic = !!(state.static.data);
+    var hasDynamic = (state.dynamic.lineupHome.some(function(p){return p.name;}) ||
+                       state.dynamic.lineupAway.some(function(p){return p.name;}) ||
+                       state.dynamic.extra);
+    var hasIntel = !!state.intel.text;
+    toggleClass(els['tab-static'], 'filled', hasStatic);
+    toggleClass(els['tab-dynamic'], 'filled', hasDynamic);
+    toggleClass(els['tab-intel'], 'filled', hasIntel);
+}
+function toggleClass(el, cls, on){
+    if(!el) return;
+    if(on) el.classList.add(cls); else el.classList.remove(cls);
+}
+
+function updateActionButton(){
+    var ready = !!(state.static.data);
+    if(ready){
+        els['actionBtn'].classList.remove('disabled');
+        els['actionBtn'].innerText = '开启量化推导';
+        els['dsTipLine'].innerText = '数据已就绪，可补充动态数据与情报后开启推导';
+    } else {
+        els['actionBtn'].classList.add('disabled');
+        els['actionBtn'].innerText = '请先完善静态数据';
+        els['dsTipLine'].innerText = '至少完成"静态数据"才能开启推导';
+    }
+}
+
+/* ============== 重置 ============== */
+function resetAll(){
+    if(state.isProcessing) return;
+    state.static = { matched:false, manual:false, data:null };
+    state.dynamic = { lineupHome:[], lineupAway:[], extra:'' };
+    state.intel = { text:'' };
+    els['homeNameInput'].value='';
+    els['awayNameInput'].value='';
+    els['matchPreviewArea'].style.display='none';
+    els['staticDataArea'].style.display='none';
+    els['manualFormArea'].style.display='none';
+    els['staticDataArea'].innerHTML='';
+    els['manualFormArea'].innerHTML='';
+    els['intelText'].value='';
+    els['dynExtra'].value='';
+    var statusEl = els['staticStatus'];
+    statusEl.innerText = '输入两队中文名称后点击搜索匹配';
+    statusEl.className = 'static-status';
+    updateTabStates();
+    updateActionButton();
+    G.toast('已重置');
+}
+
+function requestClearAll(){
+    if(!state.records.length){ G.toast('暂无记录'); return; }
+    G.showConfirm('确认全部清空历史记录？', function(){
+        state.records = [];
+        saveRecords();
+        renderHistoryPanel();
+        G.toast('已清空');
+    }, false);
+}
+
+/* ============== 历史记录存储 ============== */
+function saveRecords(){
+    try{ localStorage.setItem('GALI_V3_RECORDS', JSON.stringify(state.records)); }
+    catch(e){
+        state.records = state.records.slice(0,30);
+        try{ localStorage.setItem('GALI_V3_RECORDS', JSON.stringify(state.records)); }catch(e2){}
+    }
+}
+function loadRecords(){
+    try{
+        var s = localStorage.getItem('GALI_V3_RECORDS');
+        if(s) state.records = JSON.parse(s);
+        if(!Array.isArray(state.records)) state.records = [];
+    }catch(e){ state.records = []; }
+}
+
+function calcWinRate(){
+    var t=0,w=0;
+    state.records.forEach(function(r){
+        if(r.mark==='✅'||r.mark==='❌'){ t++; if(r.mark==='✅') w++; }
+    });
+    return { total:t, wins:w, rate: t>0 ? Math.round(w/t*100) : 0 };
+}
+
+function renderHistoryPanel(){
+    els['historyList'].innerHTML = '';
+    var q = (els['sidebarSearch'].value||'').toLowerCase();
+    var filtered = state.records;
+    if(q){
+        filtered = state.records.filter(function(r){ return r.id.toLowerCase().indexOf(q)!==-1; });
+    }
+    if(filtered.length===0){
+        var ed = document.createElement('div');
+        ed.className = 'empty-tips';
+        ed.innerText = '暂无记录';
+        els['historyList'].appendChild(ed);
+    } else {
+        filtered.forEach(function(r){
+            var idx = state.records.indexOf(r);
+            var li = document.createElement('li');
+            li.className = 'history-item';
+            li.addEventListener('click', function(){ openRecord(idx); });
+
+            var hd = document.createElement('div'); hd.className='history-header';
+            var bd = document.createElement('span'); bd.className='history-badge'; bd.innerText = r.mark || '⬜';
+            bd.addEventListener('click', function(e){ e.stopPropagation(); toggleMark(idx); });
+            var ns = document.createElement('span'); ns.className='history-name'; ns.innerText = r.id;
+            var db = document.createElement('button'); db.className='history-del'; db.innerText='×';
+            db.addEventListener('click', function(e){ e.stopPropagation(); delRecord(idx); });
+            hd.appendChild(bd); hd.appendChild(ns); hd.appendChild(db);
+
+            var sd = document.createElement('div'); sd.className='history-score';
+            sd.appendChild(document.createTextNode('赛果：'));
+            var ih = document.createElement('input'); ih.className='score-inp'; ih.value=(r.score&&r.score.home)||''; ih.placeholder='主';
+            ih.addEventListener('click', function(e){ e.stopPropagation(); });
+            ih.addEventListener('input', function(e){ updateScore(idx,'home',e.target.value); });
+            var ia = document.createElement('input'); ia.className='score-inp'; ia.value=(r.score&&r.score.away)||''; ia.placeholder='客';
+            ia.addEventListener('click', function(e){ e.stopPropagation(); });
+            ia.addEventListener('input', function(e){ updateScore(idx,'away',e.target.value); });
+            sd.appendChild(ih); sd.appendChild(document.createTextNode(' - ')); sd.appendChild(ia);
+
+            var dd = document.createElement('div'); dd.className='history-date'; dd.innerText = r.date || '';
+
+            li.appendChild(hd); li.appendChild(sd); li.appendChild(dd);
+            els['historyList'].appendChild(li);
+        });
+    }
+    var wr = calcWinRate();
+    els['sidebarFooter'].innerHTML = wr.total>0
+        ? '统计：<span>'+wr.total+'</span>场标记 | 胜率 <span>'+wr.rate+'%</span><div class="win-rate-bar"><div class="win-rate-fill" style="width:'+wr.rate+'%"></div></div>'
+        : '统计：标记✅❌后计算胜率';
+}
+
+function toggleMark(idx){
+    if(idx<0||idx>=state.records.length) return;
+    var r = state.records[idx];
+    var cm = r.mark || null;
+    if(cm==='✅') r.mark='❌';
+    else if(cm==='❌') r.mark=null;
+    else r.mark='✅';
+    saveRecords();
+    renderHistoryPanel();
+}
+function updateScore(idx, field, val){
+    if(idx<0||idx>=state.records.length) return;
+    var r = state.records[idx];
+    if(!r.score) r.score={home:'',away:''};
+    r.score[field] = val.trim();
+    saveRecords();
+}
+function delRecord(idx){
+    G.showConfirm('确认删除该记录？', function(){
+        if(idx>=0 && idx<state.records.length){
+            state.records.splice(idx,1);
+            saveRecords();
+            renderHistoryPanel();
+            G.toast('已删除');
+        }
+    }, false);
+}
+function openRecord(idx){
+    if(idx<0||idx>=state.records.length) return;
+    var r = state.records[idx];
+    toggleSidebarClose();
+    if(r.result && r.result.trim().length>10){
+        state.currentResultText = r.result;
+        state.chatHistory = r.chatHistory || [];
+        G.showResultPage(r, true);
+    } else {
+        G.toast('无有效结果');
+    }
+}
+function toggleSidebarClose(){
+    els['historySidebar'].classList.remove('open');
+    els['sidebarOverlay'].style.display = 'none';
+}
+
+window.GALI.openPanel = openPanel;
+window.GALI.closePanel = closePanel;
+window.GALI.confirmPanel = confirmPanel;
+window.GALI.updateTabStates = updateTabStates;
+window.GALI.updateActionButton = updateActionButton;
+window.GALI.resetAll = resetAll;
+window.GALI.requestClearAll = requestClearAll;
+window.GALI.saveRecords = saveRecords;
+window.GALI.loadRecords = loadRecords;
+window.GALI.renderHistoryPanel = renderHistoryPanel;
+window.GALI.toggleMark = toggleMark;
+window.GALI.delRecord = delRecord;
+window.GALI.openRecord = openRecord;
+
+window.openPanel = openPanel;
+window.closePanel = closePanel;
+window.confirmPanel = confirmPanel;
+window.resetAll = resetAll;
+window.requestClearAll = requestClearAll;
+
+})();
+
+(function(){
+'use strict';
+var G = window.GALI;
+var state = G.state, els = G.elsObj, $ = G.$;
+
+/* ============== Claude 中转站调用 ============== */
+function callClaude(messages, maxTokens){
+    var body = {
+        model: G.CLAUDE_MODEL,
+        max_tokens: maxTokens || 8000,
+        thinking: { type:'enabled', budget_tokens: Math.min(4000, Math.floor((maxTokens||8000)*0.4)) },
+        messages: messages
+    };
+    return fetch(G.CLAUDE_RELAY_URL, {
+        method:'POST',
+        headers:{
+            'Content-Type':'application/json',
+            'x-api-key': G.CLAUDE_RELAY_KEY,
+            'anthropic-version':'2023-06-01'
+        },
+        body: JSON.stringify(body)
+    }).then(function(res){
+        return res.text().then(function(t){
+            if(!res.ok) throw new Error('推导接口错误 '+res.status+': '+t.substring(0,300));
+            var d;
+            try{ d = JSON.parse(t); }catch(e){ throw new Error('返回数据解析失败'); }
+            return d;
+        });
+    }).then(function(d){
+        if(!d || !d.content) throw new Error('返回内容为空');
+        var textParts = [];
+        d.content.forEach(function(block){
+            if(block.type === 'text' && block.text) textParts.push(block.text);
+        });
+        var text = textParts.join('\n').trim();
+        if(!text) throw new Error('未获取到文本内容（可能仅返回思考过程）');
+        return text;
+    });
+}
+
+/* ============== Prompt 构建（推导铁律） ============== */
+function buildStaticDataText(){
+    var d = state.static.data;
+    if(!d) return '（无静态数据）';
+    var lines = [];
+    lines.push('赛事：'+d.league);
+    lines.push('主队：'+(d.home.nameCN||d.home.name)+'（英文：'+d.home.name+'）排名：'+d.home.rank);
+    lines.push('客队：'+(d.away.nameCN||d.away.name)+'（英文：'+d.away.name+'）排名：'+d.away.rank);
+    lines.push('--- 主队近10场 ---\n'+(d.recentHome||'未提供'));
+    if(d.recentAway) lines.push('--- 客队近10场 ---\n'+(d.recentAway||'未提供'));
+    lines.push('--- 历史交锋 ---\n'+(d.h2h||'未提供'));
+    lines.push('--- 主队未来赛程 ---\n'+(d.futureHome||'未提供'));
+    if(d.futureAway) lines.push('--- 客队未来赛程 ---\n'+(d.futureAway||'未提供'));
+    return lines.join('\n\n');
+}
+
+function buildDynamicDataText(){
+    var d = state.dynamic;
+    var homeLabel = (state.static.data && (state.static.data.home.nameCN||state.static.data.home.name)) || '主队';
+    var awayLabel = (state.static.data && (state.static.data.away.nameCN||state.static.data.away.name)) || '客队';
+    var lines = [];
+    var homeLineup = d.lineupHome.filter(function(p){return p.name;});
+    var awayLineup = d.lineupAway.filter(function(p){return p.name;});
+    if(homeLineup.length>0){
+        lines.push(homeLabel+' 首发名单（含身价）：');
+        homeLineup.forEach(function(p,i){ lines.push((i+1)+'. '+p.name+(p.value?'（身价：'+p.value+'）':'')); });
+    }
+    if(awayLineup.length>0){
+        lines.push(awayLabel+' 首发名单（含身价）：');
+        awayLineup.forEach(function(p,i){ lines.push((i+1)+'. '+p.name+(p.value?'（身价：'+p.value+'）':'')); });
+    }
+    if(d.extra) lines.push('补充信息：\n'+d.extra);
+    return lines.length>0 ? lines.join('\n') : '（用户未提供首发名单等动态数据，绝对实力板块请基于排名与已有信息合理推断，并注明"未提供首发名单，以下为基于排名与现有信息的推断"）';
+}
+
+function buildIntelText(){
+    return state.intel.text ? state.intel.text : '（用户未提供全球情报文本，本板块请注明"暂无情报输入"，并跳过信号解读）';
+}
+
+function buildSystemPrompt(){
+    return '你是世界顶级足球量化情报分析大师"加利"。你的任务是基于用户提供的静态数据(体育API)、动态数据(首发名单与身价)、全球情报文本，严格按照固定结构输出一份纯文本量化推导报告。\n\n'+
+    '【绝对铁律，永远遵守】\n'+
+    '1. 必须严格区分主队与客队，不能混淆。\n'+
+    '2. 输出必须使用下方指定的分隔符结构，禁止使用Markdown符号（不要#、*、-、>等），禁止使用表情符号修饰标题。\n'+
+    '3. 风格要接地气、穿透本质、说人话，但量化推导板块需要体现"话里有话"的深度逻辑，类似中国人高情商表达的留白与暗示，不能机械地"你说什么我做什么"。\n'+
+    '4. 量化推导板块不少于200字。\n'+
+    '5. 绝对实力板块：必须制作清晰的对比表格（用 | 分隔的纯文本表格），列出两队首发或主要球员、对应身价，计算身价总和与倍数差距，结合两队排名打出综合评分(满分100)，并明确指出谁是"正路"（正路定义为身价总和更高的一方），说明强方比弱方强在什么档次、强在哪里。\n'+
+    '6. 当下状态板块：基于近期比赛(尽量聚焦最近15天内)分析两队对手强弱档次(可用1-2-3-4档形容)、各自的攻防能力与上下限，明确指出"正路如果想赢，大概需要打入几球才有保障"；分析两队未来赛程压力(下一场何时、对手如何、是否有轮换动机)；分析历史交锋中双方面对彼此的真实心态(畏惧/平常心/无历史交锋等)。\n'+
+    '7. 全球情报板块：将情报原文逐条列出，每条后面加上[信号意图]进行疑问式推理解读，按"其他<个人<主帅<团队"的影响力顺序排列，最后给出主客队战意评分(各打分)与结论，要排除掉没有实际影响的内容，重点解读信号背后真正可能反映的态度差异。\n'+
+    '8. 量化推导板块：综合以上三大板块，给出最符合逻辑的胜平负方向、两个预测比分、预测总进球数、预测角球数区间、预测红黄牌数区间。结论要保持疑问与深度，不能脱离体系，体现"穿过迷雾看本质"的思维方式。\n\n'+
+    '【输出结构，必须严格按此分隔符，标题文字保持一致】\n\n'+
+    '===绝对实力评估开始===\n'+
+    '(此处输出对比表格、身价倍数、排名、综合评分、正路判断、强弱档次说明、最终结论)\n'+
+    '===绝对实力评估结束===\n\n'+
+    '===当前真实现状开始===\n'+
+    '(此处输出近期表现分析、上下限判断、未来赛程压力分析、历史交锋心态分析、最终结论)\n'+
+    '===当前真实现状结束===\n\n'+
+    '===全球情报开始===\n'+
+    '(此处逐条列出情报原文+信号意图解读，按影响力排序，给出战意评分与结论；若无情报输入则注明)\n'+
+    '===全球情报结束===\n\n'+
+    '===量化推导开始===\n'+
+    '(此处综合三大板块，给出最终方向：胜/平/负倾向；预测比分两个；预测总进球数；预测角球数区间；预测红黄牌数区间。不少于200字，体现深度逻辑与留白式表达)\n'+
+    '===量化推导结束===';
+}
+
+function buildUserPrompt(feedback){
+    var fbNote = feedback ? '\n\n【用户对上一次结果的反馈，请据此调整】：'+feedback+'\n' : '';
+    return '【静态数据（体育API/手动）】\n'+buildStaticDataText()+'\n\n'+
+        '【动态数据（首发名单/身价/补充信息）】\n'+buildDynamicDataText()+'\n\n'+
+        '【全球情报原文】\n'+buildIntelText()+
+        fbNote+
+        '\n\n请严格按照系统设定的结构与铁律输出报告。';
+}
+
+/* ============== 主流程：触发推导 ============== */
+var THINK_STATUSES = ['解析静态数据结构...','计算身价与排名权重...','拆解全球情报信号...','执行深度逻辑推理...','组装量化推导报告...'];
+
+function triggerExecution(){
+    if(state.isProcessing){ G.toast('正在处理中，请稍候'); return; }
+    if(!state.static.data){ G.toast('请先完善静态数据'); return; }
+    state.isProcessing = true;
+    state.chatHistory = [];
+    G.playStart();
+
+    showThinkOverlay(true);
+
+    var sys = buildSystemPrompt();
+    var usr = buildUserPrompt('');
+
+    callClaude([{role:'user', content: sys + '\n\n' + usr}], 8000)
+    .then(function(resultText){
+        if(!resultText || resultText.length < 100) throw new Error('推导结果异常或过短');
+        state.currentResultText = resultText;
+        var record = saveRecord(resultText);
+        transitionToResult(record, false);
+    }).catch(function(e){
+        showThinkOverlay(false);
+        state.isProcessing = false;
+        G.toast('推导失败：'+(e.message||'未知错误'));
+    });
+}
+
+function rerunAnalysis(feedback){
+    if(state.isProcessing){ G.toast('正在处理中'); return; }
+    if(!state.static.data){ G.toast('无可用数据'); return; }
+    state.isProcessing = true;
+    G.playStart();
+    showThinkOverlay(true);
+
+    var sys = buildSystemPrompt();
+    var usr = buildUserPrompt(feedback||'');
+
+    callClaude([{role:'user', content: sys + '\n\n' + usr}], 8000)
+    .then(function(resultText){
+        if(!resultText || resultText.length < 100) throw new Error('推导结果异常或过短');
+        state.currentResultText = resultText;
+        state.chatHistory = [];
+        var record = saveRecord(resultText);
+        transitionToResult(record, false);
+    }).catch(function(e){
+        showThinkOverlay(false);
+        state.isProcessing = false;
+        G.toast('重新推导失败：'+(e.message||'未知错误'));
+    });
+}
+
+/* ============== 思考动画过渡 ============== */
+var thinkStatusTimer = null;
+function showThinkOverlay(show){
+    if(show){
+        els['thinkOverlay'].classList.add('active');
+        var i = 0;
+        els['thinkStatusLine'].innerText = THINK_STATUSES[0];
+        thinkStatusTimer = setInterval(function(){
+            i = (i+1) % THINK_STATUSES.length;
+            els['thinkStatusLine'].innerText = THINK_STATUSES[i];
+        }, 1800);
+    } else {
+        els['thinkOverlay'].classList.remove('active');
+        if(thinkStatusTimer){ clearInterval(thinkStatusTimer); thinkStatusTimer=null; }
+    }
+}
+
+/* 思考动画 -> 结果页 的渐隐渐入过渡（各2秒） */
+function transitionToResult(record, skipThinkFade){
+    // 思考动画淡出 (CSS transition 1.4s, 留一点余量到2s)
+    setTimeout(function(){
+        showThinkOverlay(false);
+        // 短暂留白后结果页淡入
+        setTimeout(function(){
+            G.playPrinter();
+            G.vibrate();
+            G.showResultPage(record, false);
+            state.isProcessing = false;
+        }, 200);
+    }, skipThinkFade ? 0 : 600);
+}
+
+/* ============== 保存记录 ============== */
+function saveRecord(resultText){
+    var now = new Date();
+    var pad = function(n){ return n<10?'0'+n:''+n; };
+    var dateStr = now.getFullYear()+'/'+pad(now.getMonth()+1)+'/'+pad(now.getDate())+' '+pad(now.getHours())+':'+pad(now.getMinutes());
+    var d = state.static.data;
+    var matchName = d ? ((d.home.nameCN||d.home.name)+' vs '+(d.away.nameCN||d.away.name)) : '比赛';
+    var record = {
+        id: matchName+' · '+dateStr,
+        date: dateStr,
+        result: resultText,
+        mark: null,
+        score: {home:'', away:''},
+        chatHistory: [],
+        staticData: d
+    };
+    state.records.unshift(record);
+    if(state.records.length>100) state.records = state.records.slice(0,100);
+    G.saveRecords();
+    G.renderHistoryPanel();
+    return record;
+}
+
+window.GALI.callClaude = callClaude;
+window.GALI.buildSystemPrompt = buildSystemPrompt;
+window.GALI.buildUserPrompt = buildUserPrompt;
+window.GALI.triggerExecution = triggerExecution;
+window.GALI.rerunAnalysis = rerunAnalysis;
+window.GALI.showThinkOverlay = showThinkOverlay;
+
+window.triggerExecution = triggerExecution;
+
+})();
+
+(function(){
+'use strict';
+var G = window.GALI;
+var state = G.state, els = G.elsObj, $ = G.$, esc = G.escapeHtml;
+
+/* ============== 板块提取 ============== */
+function extractBlock(text, name){
+    var reg = new RegExp('==='+name+'开始===\\s*([\\s\\S]*?)\\s*==='+name+'结束===','i');
+    var m = text.match(reg);
+    return m ? m[1].trim() : '';
+}
+
+/* ============== 纯文本表格解析（| 分隔） ============== */
+function parsePipeTable(text){
+    var lines = text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.indexOf('|')!==-1;});
+    if(lines.length===0) return null;
+    var rows = lines.map(function(l){
+        return l.replace(/^\|/,'').replace(/\|$/,'').split('|').map(function(c){return c.trim();});
+    });
+    // 过滤掉纯分隔行 (---|---|---)
+    rows = rows.filter(function(r){
+        return !r.every(function(c){ return /^:?-+:?$/.test(c) || c==='' ; });
+    });
+    if(rows.length===0) return null;
+    return rows;
+}
+
+function renderTableHTML(rows){
+    if(!rows || rows.length===0) return '';
+    var html = '<table class="rc-table"><thead><tr>';
+    rows[0].forEach(function(c){ html += '<th>'+esc(c)+'</th>'; });
+    html += '</tr></thead><tbody>';
+    for(var i=1;i<rows.length;i++){
+        html += '<tr>';
+        rows[i].forEach(function(c){ html += '<td>'+esc(c)+'</td>'; });
+        html += '</tr>';
+    }
+    html += '</tbody></table>';
+    return html;
+}
+
+/* ============== 板块1：绝对实力 ============== */
+function renderStrength(text){
+    var html = '';
+    var tableRows = parsePipeTable(text);
+    var remainder = text;
+    if(tableRows){
+        html += renderTableHTML(tableRows);
+        // 移除表格行，剩余作为文字
+        remainder = text.split('\n').filter(function(l){ return l.trim().indexOf('|')===-1; }).join('\n');
+    }
+    var lines = remainder.split('\n');
+    lines.forEach(function(l){
+        l = l.trim();
+        if(!l) return;
+        // 评分识别
+        var m = l.match(/^(.+?)[：:]\s*(\d{1,3})\s*分/);
+        if(m){
+            var label = m[1].trim();
+            var score = Math.min(parseInt(m[2],10), 100);
+            html += '<div class="bar-chart"><span class="bar-label">'+esc(label)+'</span>'+
+                '<div class="bar-track"><div class="bar-fill" style="width:'+score+'%"></div></div>'+
+                '<span class="bar-score">'+score+'分</span></div>';
+            return;
+        }
+        // 正路标记
+        if(l.indexOf('正路')!==-1){
+            html += '<div class="road-tag">'+esc(l)+'</div>';
+            return;
+        }
+        html += '<p>'+esc(l)+'</p>';
+    });
+    return html || '<p>未解析到内容</p>';
+}
+
+/* ============== 板块2：当前真实现状 ============== */
+function renderReality(text){
+    var html = '';
+    var lines = text.split('\n');
+    lines.forEach(function(l){
+        l = l.trim();
+        if(!l) return;
+        html += '<p>'+esc(l)+'</p>';
+    });
+    return html || '<p>未解析到内容</p>';
+}
+
+/* ============== 板块3：全球情报 ============== */
+function renderIntel(text){
+    if(!text || text.indexOf('暂无情报')!==-1 && text.length<60){
+        return '<p>'+esc(text||'暂无情报输入')+'</p>';
+    }
+    var html = '';
+    var items = text.split(/\n(?=\d+[\.\)、]|情报\d|【)/);
+    items.forEach(function(item){
+        item = item.trim();
+        if(!item) return;
+        var signal = '';
+        var si = item.indexOf('[信号意图]');
+        if(si!==-1){
+            signal = item.substring(si+'[信号意图]'.length).trim();
+            item = item.substring(0,si).trim();
+        } else {
+            var si2 = item.indexOf('信号意图');
+            if(si2!==-1){
+                signal = item.substring(si2+'信号意图'.length).replace(/^[：:]\s*/,'').trim();
+                item = item.substring(0,si2).trim();
+            }
+        }
+        html += '<div class="intel-card"><div class="intel-text">'+esc(item)+'</div>';
+        if(signal) html += '<div class="intel-signal">🔍 信号意图：'+esc(signal)+'</div>';
+        html += '</div>';
+    });
+    return html || '<p>'+esc(text)+'</p>';
+}
+
+/* ============== 板块4：量化推导 ============== */
+function renderVerdict(text){
+    var html = '';
+    var lines = text.split('\n').map(function(l){return l.trim();}).filter(Boolean);
+    var chips = []; // {label, value}
+    var bodyLines = [];
+
+    var patterns = [
+        {label:'胜平负', re:/(主胜|主队胜|客胜|客队胜|平局|平)[\s\S]{0,6}/},
+        {label:'预测比分1', re:/比分[一1]?[：:]\s*([\d]+\s*[-：:]\s*[\d]+)/},
+        {label:'预测比分2', re:/比分[二2两]?[：:]\s*([\d]+\s*[-：:]\s*[\d]+)/},
+        {label:'总进球', re:/总进球[数]?[：:]\s*([^\n，,。]+)/},
+        {label:'角球', re:/角球[数]?[：:]\s*([^\n，,。]+)/},
+        {label:'红黄牌', re:/(红黄牌|红牌|黄牌)[数]?[：:]\s*([^\n，,。]+)/}
+    ];
+
+    lines.forEach(function(l){
+        var matched = false;
+        // 比分提取（支持"比分一：2-1"等）
+        var sm1 = l.match(/比分[一1]?[：:]\s*([\d]+\s*[-：:]\s*[\d]+)/);
+        if(sm1){ chips.push({label:'预测比分①', value:sm1[1].replace(/[：:]/,'-')}); matched=true; }
+        var sm2 = l.match(/比分[二2两]?[：:]\s*([\d]+\s*[-：:]\s*[\d]+)/);
+        if(sm2){ chips.push({label:'预测比分②', value:sm2[1].replace(/[：:]/,'-')}); matched=true; }
+        var tg = l.match(/总进球[数]?[：:]\s*([^\n，,。；;]+)/);
+        if(tg){ chips.push({label:'总进球数', value:tg[1].trim()}); matched=true; }
+        var cn = l.match(/角球[数]?[：:]\s*([^\n，,。；;]+)/);
+        if(cn){ chips.push({label:'角球数', value:cn[1].trim()}); matched=true; }
+        var cd = l.match(/(红黄牌|红黄牌数)[：:]\s*([^\n，,。；;]+)/);
+        if(cd){ chips.push({label:'红黄牌', value:cd[2].trim()}); matched=true; }
+        var dir = l.match(/(最终方向|方向|结论)[：:]\s*(主胜|客胜|平局|主队取胜|客队取胜|主队不败|客队不败)/);
+        if(dir){ chips.push({label:'方向判断', value:dir[2].trim()}); matched=true; }
+
+        if(!matched) bodyLines.push(l);
+    });
+
+    bodyLines.forEach(function(l){
+        html += '<div class="vb-line">'+esc(l)+'</div>';
+    });
+
+    var wrapped = '<div class="verdict-box">'+html;
+    if(chips.length>0){
+        wrapped += '<div class="verdict-grid">';
+        chips.forEach(function(c){
+            wrapped += '<div class="verdict-chip"><div class="verdict-chip-label">'+esc(c.label)+'</div><div class="verdict-chip-value">'+esc(c.value)+'</div></div>';
+        });
+        wrapped += '</div>';
+    }
+    wrapped += '</div>';
+    return wrapped;
+}
+
+/* ============== 顶部比赛信息条 ============== */
+function renderMatchHeader(staticData){
+    var d = staticData;
+    if(!d) return '';
+    var html = '<div class="match-header-bar">';
+    html += '<div class="mhb-team">';
+    if(d.home.logo) html += '<img src="'+d.home.logo+'" alt="">';
+    html += '<div class="mhb-team-name home">'+esc(d.home.nameCN||d.home.name)+'</div>';
+    html += '<div class="mhb-team-rank">'+esc(d.home.rank||'')+'</div>';
+    html += '</div>';
+    html += '<div class="mhb-center"><div class="mhb-vs">VS</div><div class="mhb-league">'+esc(d.league||'')+'</div></div>';
+    html += '<div class="mhb-team">';
+    if(d.away.logo) html += '<img src="'+d.away.logo+'" alt="">';
+    html += '<div class="mhb-team-name away">'+esc(d.away.nameCN||d.away.name)+'</div>';
+    html += '<div class="mhb-team-rank">'+esc(d.away.rank||'')+'</div>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
+/* ============== 主渲染函数 ============== */
+function showResultPage(record, instant){
+    var resultText = record.result || '';
+    var staticData = record.staticData || state.static.data;
+
+    var html = '';
+    html += renderMatchHeader(staticData);
+
+    var blocks = [
+        {key:'绝对实力评估', title:'绝对实力', renderer:renderStrength, num:1},
+        {key:'当前真实现状', title:'当下状态', renderer:renderReality, num:2},
+        {key:'全球情报', title:'全球情报', renderer:renderIntel, num:3},
+        {key:'量化推导', title:'量化推导', renderer:renderVerdict, num:4}
+    ];
+
+    blocks.forEach(function(b){
+        var content = extractBlock(resultText, b.key);
+        if(!content) content = '未解析到内容';
+        html += '<div class="result-card">';
+        html += '<div class="result-card-title"><span class="result-card-num">'+b.num+'</span>'+esc(b.title)+'</div>';
+        html += '<div class="result-card-body">'+b.renderer(content)+'</div>';
+        html += '</div>';
+    });
+
+    // 聊天框
+    html += '<div class="chat-section">';
+    html += '<div class="chat-divider"><div class="line"></div><span>追问 · 对话</span><div class="line"></div></div>';
+    html += '<div class="chat-log" id="chatLog"></div>';
+    html += '<div class="chat-input-row">';
+    html += '<textarea class="chat-input" id="chatInput" placeholder="对推导结果有疑问？随时问加利..." rows="1"></textarea>';
+    html += '<button class="chat-send-btn" id="chatSendBtn"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>';
+    html += '</div>';
+    html += '</div>';
+
+    els['resultBody'].innerHTML = html;
+    renderChatLog();
+    bindChatEvents();
+    bindResultTopButtons(record);
+
+    els['resultPage'].classList.add('active');
+}
+
+/* ============== 聊天框 ============== */
+function renderChatLog(){
+    var log = $('chatLog');
+    if(!log) return;
+    log.innerHTML = '';
+    state.chatHistory.forEach(function(msg){
+        var div = document.createElement('div');
+        div.className = 'chat-msg ' + (msg.role==='user'?'user':'ai') + (msg.loading?' loading':'');
+        div.innerText = msg.text;
+        log.appendChild(div);
+    });
+    log.scrollTop = log.scrollHeight;
+}
+
+function bindChatEvents(){
+    var input = $('chatInput');
+    var btn = $('chatSendBtn');
+    if(!input||!btn) return;
+    input.addEventListener('input', function(){
+        input.style.height='auto';
+        input.style.height = Math.min(input.scrollHeight,120)+'px';
+    });
+    var send = function(){
+        var text = input.value.trim();
+        if(!text) return;
+        if(state.isProcessing){ G.toast('正在处理中'); return; }
+        G.playClick();
+        state.chatHistory.push({role:'user', text:text});
+        state.chatHistory.push({role:'ai', text:'思考中...', loading:true});
+        renderChatLog();
+        input.value=''; input.style.height='auto';
+        sendChatMessage(text);
+    };
+    btn.addEventListener('click', send);
+    input.addEventListener('keydown', function(e){
+        if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+    });
+}
+
+function sendChatMessage(userText){
+    state.isProcessing = true;
+    var sys = '你是足球量化分析大师"加利"。以下是你刚才生成的推导报告全文，请基于此报告与用户进行追问对话，保持与报告一致的逻辑与立场，回答简洁、说人话，不使用Markdown符号。\n\n【推导报告原文】\n'+state.currentResultText;
+
+    var messages = [{role:'user', content: sys}];
+    // 拼接历史对话（排除当前loading占位）
+    var history = state.chatHistory.filter(function(m){ return !m.loading; });
+    // Anthropic messages需要严格 user/assistant 交替；构造方式：将sys作为第一条user，紧跟一个assistant确认，再拼历史
+    messages.push({role:'assistant', content:'已阅读报告，请提问。'});
+    history.forEach(function(m){
+        messages.push({role: m.role==='user'?'user':'assistant', content: m.text});
+    });
+
+    G.callClaude(messages, 2000).then(function(replyText){
+        // 替换最后一条loading
+        for(var i=state.chatHistory.length-1;i>=0;i--){
+            if(state.chatHistory[i].loading){ state.chatHistory[i] = {role:'ai', text:replyText}; break; }
+        }
+        renderChatLog();
+        // 持久化到当前记录
+        persistChatHistory();
+        state.isProcessing = false;
+    }).catch(function(e){
+        for(var i=state.chatHistory.length-1;i>=0;i--){
+            if(state.chatHistory[i].loading){ state.chatHistory[i] = {role:'ai', text:'回复失败：'+(e.message||'未知错误')}; break; }
+        }
+        renderChatLog();
+        state.isProcessing = false;
+    });
+}
+
+function persistChatHistory(){
+    if(state.records.length>0){
+        state.records[0].chatHistory = state.chatHistory;
+        G.saveRecords();
+    }
+}
+
+/* ============== 结果页顶部按钮 ============== */
+function bindResultTopButtons(record){
+    var copyBtn = els['btnCopyResult'];
+    var rerunBtn = els['btnRerun'];
+    copyBtn.onclick = function(){
+        G.playClick();
+        var text = state.currentResultText || '';
+        if(!text){ G.toast('无内容可复制'); return; }
+        if(navigator.clipboard){
+            navigator.clipboard.writeText(text).then(function(){ G.toast('已复制'); }).catch(function(){ G.toast('复制失败'); });
+        } else {
+            var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.left='-9999px';
+            document.body.appendChild(ta); ta.select();
+            try{ document.execCommand('copy'); G.toast('已复制'); }catch(e){ G.toast('复制失败'); }
+            document.body.removeChild(ta);
+        }
+    };
+    rerunBtn.onclick = function(){
+        G.playClick();
+        G.showConfirm('请告诉加利哪里需要调整（可留空直接重新推导）：', function(feedback){
+            closeResult();
+            G.rerunAnalysis(feedback);
+        }, true);
+    };
+}
+
+function closeResult(){
+    els['resultPage'].classList.remove('active');
+}
+
+window.GALI.showResultPage = showResultPage;
+window.GALI.closeResult = closeResult;
+window.closeResult = closeResult;
+
+})();
+
+(function(){
+'use strict';
+var G = window.GALI;
+
+function init(){
+    G.cacheEls();
+    G.loadRecords();
+    G.updateTabStates();
+    G.updateActionButton();
+
+    var els = G.elsObj;
+
+    // 确认框
+    els['btnSubmitConfirm'].addEventListener('click', function(){
+        var cb = G.state.confirmCB;
+        var val = els['confirmInput'].value.trim();
+        G.closeConfirm();
+        if(typeof cb==='function') cb(val);
+    });
+    els['btnCancelConfirm'].addEventListener('click', function(){ G.closeConfirm(); });
+
+    // 静态面板 - 输入框回车触发搜索
+    els['awayNameInput'].addEventListener('keydown', function(e){
+        if(e.key==='Enter'){ e.preventDefault(); G.playClick(); window.searchTeams(); }
+    });
+
+    G.renderHistoryPanel();
+
+    if('serviceWorker' in navigator){
+        try{
+            navigator.serviceWorker.register('/sw.js').catch(function(){ /* ignore on unsupported origins */ });
+        }catch(e){}
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+
+})();
+
+</script>
+</body>
+</html>
